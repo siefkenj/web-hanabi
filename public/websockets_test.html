@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Websockets Test</title>
+	<script src="/js/socket.io.js"></script>
+	<script>
+function parseUriSearchString (str) {
+	// Remove leading questionmark
+	if (str.charAt(0) == '?') {
+		str = str.slice(1);
+	}
+
+	// Split up strings in the form of "foo=bar&baz=bat" into
+	// objects {foo: 'bar', baz: 'bat'}
+	ret = {}
+	str.split('&').forEach(function(s){
+		vals = s.split('=');
+		ret[decodeURI(vals[0] || '')] = decodeURI(vals[1] || '')
+	});
+	return ret;
+}
+window.onload = function() {
+	// grab the name and room from the URI search string, or put
+	// in some defaults if they're not given.
+	var args = parseUriSearchString(window.location.search);
+	var name = args.name || 'Tom';
+	var room = args.room || 'innercircle';
+	if (!args.name || !args.room) {
+		window.location.search = "?name=" + encodeURI(name) + "&room=" + encodeURI(room);
+	}
+	
+
+	console.log(args)
+
+	document.querySelector('#name').innerHTML = name;
+	document.querySelector('#room').innerHTML = room;
+	var messagesDiv = document.querySelector('#messages');
+
+	// Set up the web socket
+	var socket = io.connect();
+	socket.on('connect', function () {
+		console.log('connected');
+		// Join the appropriate room as soon as we've connected
+		socket.emit('room', room);
+	});
+	socket.on('message', function(data) {
+		console.log('Got data', data.message);
+		messagesDiv.innerHTML += "<br /><span style='color: green;'>&gt;</span> " + data.message;
+	});
+
+	document.querySelector('#sendMessage').addEventListener('click', function () {
+		var message = "This is a random message " + Math.random();
+		socket.emit('broadcast', message);
+		// Since the message won't be rebroadcast to ourselves,
+		// we should document it manually
+		messagesDiv.innerHTML += "<br /><span style='color: red;'>&lt;</span> " + message;
+	});
+};
+	</script>
+</head>
+<body>
+	<h1>Web Sockets Test</h1>
+	<h3>Stats</h3>
+	Name: <span id="name" style="color: blue;"></span>;
+	Room: <span id="room" style="color: blue;"></span>
+	<h2>Messages</h2>
+	<button id="sendMessage">Send Random Message</button>
+	<div id="messages" style="border: 1px solid black;"></div>
+</body>
+</html>
