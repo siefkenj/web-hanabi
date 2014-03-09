@@ -31,6 +31,10 @@ io.sockets.on('connection', function(socket) {
     // rooms allow us to limit our broadcasts to others in the same room.
     socket.on('room', function(room) {
         console.log('Joining room', room);
+        // leave any previous room we may have been in
+        if (socket.currentRoom) {
+            socket.leave(socket.currentRoom);
+        }
         socket.join(room)
         socket.currentRoom = room; 
     });
