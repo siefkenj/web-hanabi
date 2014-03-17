@@ -40,12 +40,23 @@ window.onload = function() {
 	var socket = io.connect();
 	socket.on('connect', function () {
 		console.log('connected');
+		// Set our name
+		socket.emit('set-name', name);
 		// Join the appropriate room as soon as we've connected
-		socket.emit('room', room);
+		socket.emit('set-room', room);
+		// Get our ID from the server so we know where we
+		// show up in the list of people in our room
+		socket.emit('query-id');
 	});
 	socket.on('message', function(data) {
 		console.log('Got data', data.message);
 		messagesDiv.innerHTML += "<br /><span style='color: green;'>&gt;</span> " + data.message;
+	});
+	socket.on('room-info', function(data) {
+		console.log('Room info:', data);
+	});
+	socket.on('id-info', function(data) {
+		console.log('Id info:', data);
 	});
 
 	document.querySelector('#sendMessage').addEventListener('click', function () {
