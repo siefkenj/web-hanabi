@@ -4,6 +4,7 @@
 	<title>Hanabi Lobby</title>
 	<script src="/js/socket.io.js"></script>
 	<script>
+
 function parseUriSearchString (str) {
 	// Remove leading questionmark
 	if (str.charAt(0) == '?') {
@@ -12,14 +13,15 @@ function parseUriSearchString (str) {
 
 	// Split up strings in the form of "foo=bar&baz=bat" into
 	// objects {foo: 'bar', baz: 'bat'}
-	ret = {}
+	var ret = {}
 	str.split('&').forEach(function(s){
-		vals = s.split('=');
+		var vals = s.split('=');
 		ret[decodeURI(vals[0] || '')] = decodeURI(vals[1] || '')
 	});
 	return ret;
-}
-window.onload = function() {
+	}
+
+	window.onload = function() {
 	// grab the name and room from the URI search string, or put
 	// in some defaults if they're not given.
 	var args = parseUriSearchString(window.location.search);
@@ -52,7 +54,11 @@ window.onload = function() {
 		console.log('Got data', data.message);
 		messagesDiv.innerHTML += "<br /><span style='color: green;'>&gt;</span> " + data.message;
 	});
+	//lists all the client and room data
+	//the rooms are links to the room in question.
+	//
 	socket.on('room-info', function(data) {
+		var i;
 		console.log('Room info:', data);
 		messagesDiv.innerHTML = "<div id = 'titles'>Users in the Room</div>"
 		for (i = 0; i < data.clients.length; i++)
@@ -62,23 +68,27 @@ window.onload = function() {
 		messagesDiv.innerHTML += "<div id = 'titles'>Avaliable rooms</div>"
 		for (i = 1; i < data.roomList.length; i++)
 		{
-			messagesDiv.innerHTML += "<div id='roomLinks'>" + data.roomList[i].replace(/^\//, '') + "</div>"
+			var roomName = data.roomList[i].replace(/^\//, '')
+			messagesDiv.innerHTML += "<a href='hanabi_lobby.html?name=" + name + "&room=" + roomName + "' >" + roomName + "</a><br>"
 		}
-		document.querySelector('roomLinks').innerhtml
+
 		
 	});
 	socket.on('id-info', function(data) {
 		console.log('Id info:', data);
 	});
+	
+	// change function sets the name to the value in the setname box
+	// it also sets the room to the text in the room box
 	var change = function ()
 	{
 		name = document.querySelector('#setName').value;
-		listUsers();
 		room = document.querySelector('#roomName').value;
-		listRooms();
 		window.location.search = "?name=" + encodeURI(name) + "&room=" + encodeURI(room);
 		socket.emit('set-name', name);
 	}
+
+	// lets the user input using enter
 	var enterData = function (event) 
 	{
 		if(event.keyCode == 13)
@@ -86,15 +96,9 @@ window.onload = function() {
 			change();
 		}
 	}
-	var listUsers = function()
-	{
-		
-	}
-	var listRooms = function()
-	{
-		
-	}
 
+	//set ups is the button that sets the room and user data when clicked it runs the change function which sets the information in the URL
+	//The 'setname' and 'roomname' functions are for the ability to press enter in either the set name or set room text inputs
 	document.querySelector('#setUps').addEventListener('click', change);
 	document.querySelector('#setName').addEventListener('keydown', enterData);
 	document.querySelector('#roomName').addEventListener('keydown', enterData);
@@ -111,6 +115,11 @@ window.onload = function() {
 	Go to a Room Baby: <input type = "text" id ="roomName"><br>
 	<button id="setUps">Set</button>
 	<div id="messages" style="border: 1px solid black;"></div>
-		
+
+<style>
+#roomLinks{
+	
+}
+</style>
 </body>
 </html>
