@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Hanabi Lobby</title>
+	<script src="/js/socket.io.js"></script>
+	<script>
+function parseUriSearchString (str) {
+	// Remove leading questionmark
+	if (str.charAt(0) == '?') {
+		str = str.slice(1);
+	}
+
+	// Split up strings in the form of "foo=bar&baz=bat" into
+	// objects {foo: 'bar', baz: 'bat'}
+	ret = {}
+	str.split('&').forEach(function(s){
+		vals = s.split('=');
+		ret[decodeURI(vals[0] || '')] = decodeURI(vals[1] || '')
+	});
+	return ret;
+}
+window.onload = function() {
+	// grab the name and room from the URI search string, or put
+	// in some defaults if they're not given.
+	var args = parseUriSearchString(window.location.search);
+	var name = args.name || 'Tom';
+	var room = args.room || 'innercircle';
+	if (!args.name || !args.room) {
+		window.location.search = "?name=" + encodeURI(name) + "&room=" + encodeURI(room);
+	}
+	
+
+	console.log(args)
+
+	document.querySelector('#name').innerHTML = name;
+	document.querySelector('#room').innerHTML = room;
+	var messagesDiv = document.querySelector('#messages');
+
+	// Set up the web socket
+	var socket = io.connect();
+	socket.on('connect', function () {
+		console.log('connected');
+		// Set our name
+		socket.emit('set-name', name);
+		// Join the appropriate room as soon as we've connected
+		socket.emit('set-room', room);
+		// Get our ID from the server so we know where we
+		// show up in the list of people in our room
+		socket.emit('query-id');
+	});
+	socket.on('message', function(data) {
+		console.log('Got data', data.message);
+		messagesDiv.innerHTML += "<br /><span style='color: green;'>&gt;</span> " + data.message;
+	});
+	socket.on('room-info', function(data) {
+		console.log('Room info:', data);
+		messagesDiv.innerHTML = "<div id = 'titles'>Users in the Room</div>"
+		for (i = 0; i < data.clients.length; i++)
+		{
+			messagesDiv.innerHTML += data.clients[i].name + '<br>'
+		}
+		messagesDiv.innerHTML += "<div id = 'titles'>Avaliable rooms</div>"
+		for (i = 1; i < data.roomList.length; i++)
+		{
+			messagesDiv.innerHTML += "<div id='roomLinks'>" + data.roomList[i].replace(/^\//, '') + "</div>"
+		}
+		document.querySelector('roomLinks').innerhtml
+		
+	});
+	socket.on('id-info', function(data) {
+		console.log('Id info:', data);
+	});
+	var change = function ()
+	{
+		name = document.querySelector('#setName').value;
+		listUsers();
+		room = document.querySelector('#roomName').value;
+		listRooms();
+		window.location.search = "?name=" + encodeURI(name) + "&room=" + encodeURI(room);
+		socket.emit('set-name', name);
+	}
+	var enterData = function (event) 
+	{
+		if(event.keyCode == 13)
+		{
+			change();
+		}
+	}
+	var listUsers = function()
+	{
+		
+	}
+	var listRooms = function()
+	{
+		
+	}
+
+	document.querySelector('#setUps').addEventListener('click', change);
+	document.querySelector('#setName').addEventListener('keydown', enterData);
+	document.querySelector('#roomName').addEventListener('keydown', enterData);
+
+};
+	</script>
+</head>
+<body>
+	<h3>Your Information</h3>
+	Name: <span id="name" style="color: blue;"></span>;
+	Room: <span id="room" style="color: blue;"></span>	
+	<h2><u>Users in Room</u></h2>
+	Set UserName: <input type = "text" id="setName"><br>
+	Go to a Room Baby: <input type = "text" id ="roomName"><br>
+	<button id="setUps">Set</button>
+	<div id="messages" style="border: 1px solid black;"></div>
+		
+</body>
+</html>
