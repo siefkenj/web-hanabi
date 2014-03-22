@@ -66,6 +66,14 @@ window.onload = function() {
 		// we should document it manually
 		messagesDiv.innerHTML += "<br /><span style='color: red;'>&lt;</span> " + message;
 	});
+	var readyState = false;
+	document.querySelector('#setReadyState').addEventListener('click', function () {
+		readyState = !readyState;
+		socket.emit('set-data', {readyState: readyState});
+		// Since the message won't be rebroadcast to ourselves,
+		// we should document it manually
+		messagesDiv.innerHTML += "<br /><span style='color: red;'>" + name + "</span> Ready: " + readyState;
+	});
 };
 	</script>
 </head>
@@ -76,6 +84,7 @@ window.onload = function() {
 	Room: <span id="room" style="color: blue;"></span>
 	<h2>Messages</h2>
 	<button id="sendMessage">Send Random Message</button>
+	<button id="setReadyState">I'm Ready</button>
 	<div id="messages" style="border: 1px solid black;"></div>
 </body>
 </html>
