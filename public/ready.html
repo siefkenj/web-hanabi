@@ -62,33 +62,25 @@ function parseUriSearchString (str) {
 		var i;
 		var j;
 		console.log('Room info:', data);
-		messagesDiv.innerHTML = "<div id = 'titles'>Users in the Room</div>"
-		
-		
-		
-		if (readyState == false){
-				setReadyState.innerHTML = "I\'m ready!";
-				document.querySelector('#name').setAttribute('style', 'color: red; font-weight: bold');
-				messagesDiv.innerHTML = "<span style='color:red; font-size: 30px;'> &bull;</span>";
-			}else{
-				setReadyState.innerHTML = "I\'m not ready!";
-				document.querySelector('#name').setAttribute('style', 'color: green; font-weight: bold');
-				messagesDiv.innerHTML = "<span style='color:green; font-size: 30px;'> &bull;</span>";
-			}
-		
+		messagesDiv.innerHTML = "<div id = 'titles'>Users in the Room</div>"	
 		
 		for (i = 0; i < data.clients.length; i++){
+			if (readyState == false){
+				messagesDiv.innerHTML += "<span style='color:red;'> &bull;</span>"
+				setReadyState.innerHTML = "I\'m ready!";
+			}else{
+				messagesDiv.innerHTML += "<span style='color:green;'> &bull;</span>"	
+				setReadyState.innerHTML = "I\'m not ready!";
+			}
 			messagesDiv.innerHTML += data.clients[i].name + '<br>'
 		}
 		
 		messagesDiv.innerHTML += "<div id = 'titles'>Avaliable rooms</div>"
 		for (i = 1; i < data.roomList.length; i++){
 			var roomName = data.roomList[i].replace(/^\//, '')
-			messagesDiv.innerHTML += "<a href='hanabi_lobby.html?name=" + name + "&room=" + roomName + "' >" + roomName + "</a><br>"
+			messagesDiv.innerHTML += "<a href='?name=" + name + "&room=" + roomName + "' >" + roomName + "</a><br>"
 		}
-
-
-		
+	
 	});
 	socket.on('id-info', function(data) {
 		console.log('Id info:', data);
@@ -144,9 +136,7 @@ function parseUriSearchString (str) {
 	<div id="messages" style="border: 1px solid black;"></div>
 
 <style>
-#roomLinks{
-	
-}
+
 </style>
 </body>
 </html>
