@@ -65,12 +65,10 @@ function parseUriSearchString (str) {
 		messagesDiv.innerHTML = "<div id = 'titles'>Users in the Room</div>"	
 		
 		for (i = 0; i < data.clients.length; i++){
-			if (readyState == false){
+			if (data.clients[i].data.readyState == false){
 				messagesDiv.innerHTML += "<span style='color:red;'> &bull;</span>"
-				setReadyState.innerHTML = "I\'m ready!";
 			}else{
-				messagesDiv.innerHTML += "<span style='color:green;'> &bull;</span>"	
-				setReadyState.innerHTML = "I\'m not ready!";
+				messagesDiv.innerHTML += "<span style='color:green;'> &bull;</span>"
 			}
 			messagesDiv.innerHTML += data.clients[i].name + '<br>'
 		}
@@ -110,9 +108,13 @@ function parseUriSearchString (str) {
 	var readyState = false;
 	document.querySelector('#setReadyState').addEventListener('click', function () {
 		readyState = !readyState;
+		if (readyState == false){
+ 			setReadyState.innerHTML = "I\'m ready!";
+ 		}else{
+ 			setReadyState.innerHTML = "I\'m not ready!";
+ 		}
 		socket.emit('set-data', {readyState: readyState});
-		// Since the message won't be rebroadcast to ourselves,
-		// we should document it manually
+
 	});
 
 	//set ups is the button that sets the room and user data when clicked it runs the change function which sets the information in the URL
