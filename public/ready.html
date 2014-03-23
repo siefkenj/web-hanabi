@@ -102,8 +102,12 @@ function parseUriSearchString (str) {
 	// it also sets the room to the text in the room box
 	var change = function ()
 	{
-		name = document.querySelector('#setName').value;
-		room = document.querySelector('#roomName').value;
+		if (document.querySelector('#setName').value){		
+			name = document.querySelector('#setName').value;
+		}
+		if (document.querySelector('#roomName').value){
+			room = document.querySelector('#roomName').value;
+		}
 		window.location.search = "?name=" + encodeURI(name) + "&room=" + encodeURI(room);
 		socket.emit('set-name', name);
 	}
