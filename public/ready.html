@@ -57,23 +57,37 @@ function parseUriSearchString (str) {
 	//lists all the client and room data
 	//the rooms are links to the room in question.
 	//
+	
+	var readyState = false;
+	document.querySelector('#setReadyState').addEventListener('click', function () {
+		readyState = !readyState;
+		if (readyState == false){
+ 			setReadyState.innerHTML = "I\'m ready!";
+ 		}else{
+ 			setReadyState.innerHTML = "I\'m not ready!";
+ 		}
+		socket.emit('set-data', {readyState: readyState});
+
+	});
+	
 	socket.on('room-info', function(data) {
 	
 		var i;
 		var j;
 		console.log('Room info:', data);
-		messagesDiv.innerHTML = "<div id = 'titles'>Users in the Room</div>"	
+		messagesDiv.innerHTML = "<div id = 'titles'>Users in the Room:</div>"	
 		
 		for (i = 0; i < data.clients.length; i++){
-			if (data.clients[i].data.readyState == false){
-				messagesDiv.innerHTML += "<span style='color:red;'> &bull;</span>"
-			}else{
+			
+			if (data.clients[i].data.readyState == true){
 				messagesDiv.innerHTML += "<span style='color:green;'> &bull;</span>"
+			}else{
+				messagesDiv.innerHTML += "<span style='color:red;'> &bull;</span>"
 			}
 			messagesDiv.innerHTML += data.clients[i].name + '<br>'
 		}
 		
-		messagesDiv.innerHTML += "<div id = 'titles'>Avaliable rooms</div>"
+		messagesDiv.innerHTML += "<div id = 'titles'>Available rooms:</div>"
 		for (i = 1; i < data.roomList.length; i++){
 			var roomName = data.roomList[i].replace(/^\//, '')
 			messagesDiv.innerHTML += "<a href='?name=" + name + "&room=" + roomName + "' >" + roomName + "</a><br>"
@@ -102,20 +116,6 @@ function parseUriSearchString (str) {
 			change();
 		}
 	}
-	
-	//code for ready state, need to add counter to start game with 2-5ish people..
-	//creates a green bullet beside name when user is ready
-	var readyState = false;
-	document.querySelector('#setReadyState').addEventListener('click', function () {
-		readyState = !readyState;
-		if (readyState == false){
- 			setReadyState.innerHTML = "I\'m ready!";
- 		}else{
- 			setReadyState.innerHTML = "I\'m not ready!";
- 		}
-		socket.emit('set-data', {readyState: readyState});
-
-	});
 
 	//set ups is the button that sets the room and user data when clicked it runs the change function which sets the information in the URL
 	//The 'setname' and 'roomname' functions are for the ability to press enter in either the set name or set room text inputs
@@ -127,17 +127,35 @@ function parseUriSearchString (str) {
 	</script>
 </head>
 <body>
-	<h3>Your Information</h3>
-	Name: <span id="name" style="color: blue;"></span>;
-	Room: <span id="room" style="color: blue;"></span>	
-	<h2><u>Users in Room</u></h2>
-	Set UserName: <input type = "text" id="setName"><br>
-	Go to a Room Baby: <input type = "text" id ="roomName"><br>
 	
-	<button id="setUps">Set</button><button id="setReadyState"> I'm Ready! </button>
+	<div id="wrapper" style="text-align: center">
+		<h3>Hanabi Lobby</h3>
+		<p> Click on a room to join!<br>Or create a new one!</p>
+		Name: <span id="name" style="color: blue;"></span>
+		Current room: <span id="room" style="color: blue;"></span><br>
+		Set Username: <input type = "text" id="setName"><br>
+		Change room: <input type = "text" id ="roomName"><br>
+		<button id="setUps">Set</button><button id="setReadyState"> I'm Ready! </button>
+	</div>
 	<div id="messages" style="border: 1px solid black;"></div>
+		
+		
 
 <style>
+	
+	#messages {
+		border: 1px solid black;
+		width: 250px;
+		margin-left: auto;
+		margin-right: auto;
+		font-family: calibri;
+		}
+		
+	#titles {
+		text-align: center;
+		font-size: 18px;
+		
+	
 
 </style>
 </body>
