@@ -1,6 +1,7 @@
 <!doctype html>
 <html>
 <head>
+<script src="js/game_init.js"></script>
 <script>
 "use strict";
 window.onload = function() {
@@ -70,7 +71,25 @@ window.onload = function() {
 
 
 
+
+	// shuff a deck
+	function shuffle (list) {
+		// create an array with array indices and random numbers
+		var indices = Array.apply(null, Array(list.length)).map(function(_,i) { return [i, Math.random()]; });
+		// sort based on the random numbers
+		indices.sort(function (a,b) {
+			return a[1] - b[1];
+		});
+
+		var ret = new Array(list.length);
+		for (var i = 0; i < list.length; i++) {
+			ret[i] = list[indices[i][0]];
+		}
+		return ret;
+	}
+
 	window.yyy=deck;
+	window.shuffle = shuffle
 	console.log(deck);
 }
 </script>
