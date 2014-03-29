@@ -1,0 +1,78 @@
+<!doctype html>
+<html>
+<head>
+<script>
+"use strict";
+window.onload = function() {
+	var colors = ['red','green','blue','black','yellow'];
+	var numbers = [[1,3], [2,2], [3,2], [4,2], [5,1]];
+	
+	// method 1
+	var deck = [];
+	colors.forEach(function (color) {
+		numbers.forEach(function (numCountPair) {
+			var num = numCountPair[0];
+			var count = numCountPair[1];
+			for (var i = 0; i < count; i++) {
+				deck.push({
+					color: color, 
+					number: num, 
+					knowNot: {}
+				});
+			}
+		});
+	});
+
+	// method 2
+	deck = [];
+	for (var i = 0; i < colors.length; i++) {
+		var color = colors[i];
+		for (var j = 0; j < numbers.length; j++) {
+			var num = numbers[j][0];
+			var count = numbers[j][1];
+			for (var k = 0; k < count; k++) {
+				deck.push({
+					color: color, 
+					number: num, 
+					knowNot: {}
+				});
+			}
+
+		}
+	}
+
+	// method 3
+	function addCopiesOfCard(list, number, color, copies) {
+		for (var i = 0; i < copies; i++) {
+			list.push( {color: color, number: number, knowNot: {}} );
+		}
+	}
+	deck = [];
+	for (var i = 0; i < colors.length; i++) {
+		var color = colors[i];
+		for (var j = 0; j < numbers.length; j++) {
+			var num = numbers[j][0];
+			var count = numbers[j][1];
+			addCopiesOfCard( deck, num, color, count );
+
+		}
+	}
+
+	// method 4
+	var numStack = [1, 1, 1, 2, 2, 3, 3, 4, 4, 5];
+	deck = [];
+	for (var i = 0; i < colors.length; i++) {
+		var color = colors[i];
+		deck = deck.concat(numStack.map(function (number) {
+			return {color: color, number: number, knowNot: {}};
+		}));
+	}
+
+
+
+	window.yyy=deck;
+	console.log(deck);
+}
+</script>
+</head>
+</html>
