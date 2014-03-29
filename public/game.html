@@ -1,0 +1,75 @@
+<script>
+"use strict";
+
+// takes in an array of cards and shuffles the cards
+var shuffle = function(deck){
+	var cardsleft = deck.length;
+	var shuffleddeck = [];
+	var i;
+	for (i = cardsleft; i > 0 ; i--){
+		var entry = Math.floor((Math.random()*i));
+		shuffleddeck.push(deck[entry])
+		deck.splice(entry, 1)
+	}
+	deck = shuffleddeck;
+	return deck;
+}
+
+var game = {
+	players : [],
+	deck : [],
+	discard : [],
+	tableau	: [],
+	cluetokens : 8,
+	hearts : 3,
+	currentplayer : null,
+	lastaction : null}
+	var colours = [];
+	var i, j;
+	colours.push('red', 'blue', 'green', 'yellow', 'black');
+	//generates a deck of cards that has 3 1's a single 5 and 2 of the numbers 2,3,4
+	for (j = 0; j < colours.length ; j++){
+		for(i = 1; i <= 5; i++){
+			game.deck.push({colour: colours[j],number: i,known: null});
+			game.deck.push({colour: colours[j],number: i,known: null});
+			if(i == 1)
+				game.deck.push({colour: colours[j],number: i,known: null});
+			if(i == 5)
+				game.deck.pop();
+		}
+	game.deck = shuffle(game.deck);
+}
+
+
+
+
+window.xxx= game.deck
+
+</script>
+</head>
+<body>
+	
+	<div id="wrapper" style="text-align: center">
+		<h3>Game Things</h3>
+		
+		
+
+<style>
+	
+	#messages {
+		border: 1px solid black;
+		width: 250px;
+		margin-left: auto;
+		margin-right: auto;
+		font-family: calibri;
+		}
+		
+	#titles {
+		text-align: center;
+		font-size: 18px;
+		
+	
+
+</style>
+</body>
+</html
