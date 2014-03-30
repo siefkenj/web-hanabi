@@ -1,0 +1,38 @@
+<!doctype html>
+<html>
+<head>
+	<title>Heart Display</title>
+	<script src="js/game_init.js"></script>
+	<script>
+
+window.onload = function() {
+	var game = createDummyGame(3);
+	var hearts = game.hearts;
+
+	document.querySelector('#heartDisplay .hearts').textContent = hearts;
+};
+
+	</script>
+	<style>
+#heartDisplay {
+	background-image: url('images/heart.svg');
+	width: 100px;
+	height: 100px;
+	background-size: 100% 100%;
+}
+#heartDisplay .hearts {
+	color: white;
+	font-size: 30px;
+	margin-left: 37px;
+	margin-right: 50px;
+	padding-top: 25px;
+	display: block;
+	text-align: middle;
+	font-weight: bold;
+}
+	</style>
+</head>
+<body>
+	<div id="heartDisplay"><span class="hearts">0</span></div>
+</body>
+</html>
