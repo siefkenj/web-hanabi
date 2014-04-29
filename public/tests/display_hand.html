@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
 <head>
-<script src="js/game_init.js"></script>
+<script src="/js/game_init.js"></script>
 <script>
 "use strict";
 //this changes the number of players that are in the Dummy game
@@ -33,7 +33,7 @@ window.onload = function() {
 		 var item = document.createElement("img");
 		 listing.appendChild(item)
 		 item.className = 'card';
-      		 item.src = "images/cards/" + game.players[player].hand[i].number + "-" + game.players[player].hand[i].color + ".png";
+      		 item.src = "/images/cards/" + game.players[player].hand[i].number + "-" + game.players[player].hand[i].color + ".png";
        		 cardlist.appendChild(listing);
 	}
 
