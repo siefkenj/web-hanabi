@@ -25,7 +25,7 @@ function createDummyGame (numPlayers) {
     for (var i = 0; i < colors.length; i++) {
             var color = colors[i];
             deck = deck.concat(numStack.map(function (number) {
-                    return {color: color, number: number, knowNot: {}};
+                    return {color: color, number: number, impossible: {}};
             }));
     }
 
