@@ -1,0 +1,75 @@
+<!doctype html>
+<html>
+<head>
+<script src="js/game_init.js"></script>
+<script>
+"use strict";
+//this changes the number of players that are in the Dummy game
+var game = createDummyGame(4);
+
+// use this to choose one of the players
+var player = 0
+window.onload = function() {
+	function toggleSelectedClass(event) {
+		var target = event.currentTarget;
+		target.selectedCard = !target.selectedCard;
+		if (target.selectedCard) {
+			target.classList.add('selected');
+		} else {
+			target.classList.remove('selected');
+		}
+	}
+
+
+	var cards = document.querySelectorAll('img');
+	for (var i=0; i < cards.length; i++) {
+		var card = cards[i];
+		card.addEventListener('click', toggleSelectedClass);
+	}
+
+	//prints out the selected players hand in a game
+	for (var i = 0; i < game.players[player].hand.length; i++){
+		 var listing = document.createElement("li");
+		 var item = document.createElement("img");
+		 listing.appendChild(item)
+		 item.className = 'card';
+      		 item.src = "images/cards/" + game.players[player].hand[i].number + "-" + game.players[player].hand[i].color + ".png";
+       		 cardlist.appendChild(listing);
+	}
+
+	
+}
+</script>
+<style>
+	body {
+		background: #ccc;
+	}
+	#cardlist li {
+		display: inline-block;
+		margin: 5px;
+	}
+
+	.card {
+		background: #fff;
+		border-radius: 10px;
+		border: 1px solid #555;
+		transition: box-shadow .2s;
+	}
+	.card:hover {
+		box-shadow: 0px 0px 10px #444;
+	}
+
+	.card.selected {
+		box-shadow: 0px 0px 5px #00f;
+	}
+	
+	.card.selected:hover {
+		box-shadow: 0px 0px 10px #00f;
+	}
+</style>
+</head>
+<body>
+	<ul id="cardlist">
+	</ul>
+</body>
+</html>
