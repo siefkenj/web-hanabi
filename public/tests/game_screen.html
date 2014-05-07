@@ -76,6 +76,7 @@ function updateScreen(game){
 	// set up the other player's hands
 	for (var i = 0; i < others.length; i++) {
 		var other = others[i];
+		document.querySelector('#other' + i + ' .playerName').textContent = other.name;
 		setupHand(other.hand, document.querySelector('#other' + i + ' .handContents'));
 	}
 
@@ -233,7 +234,8 @@ window.onload = function(){
 	</div>
 	<div id="othersHands">othersHands
 		<div id="other0" class="handDisplay">other1
-			<h4 class="playerName"></h4><div class="handContents"></div>
+			<h4 class="playerName"></h4>
+			<div class="handContents"></div>
 		</div>
 		<div id="other1" class="handDisplay">other2
 			<h4 class="playerName"></h4><div class="handContents"></div>
