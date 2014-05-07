@@ -11,12 +11,34 @@ function getPlayerById(game, id) {
 	}
 }
 
+// returns a list of classes corresponding to
+// what is known about this card
+function getKnowledgeClasses(card) {
+	var possibleKnowledge = ['red','green','blue','yellow','black','1','2','3','4','5'];
+	var ret = [];
+	for (var i = 0; i < possibleKnowledge.length; i++) {
+		var possibility = possibleKnowledge[i];
+		if (!(possibility in card.impossible)) {
+			ret.push("maybe-" + possibility);
+		}
+	}
+	return ret;
+}
+
 // hand is the players hand, parent is the div
 // that all the cards should be displayed in.
 function setupHand(hand, parent) {
 	var s = "<ul>";
 	for (var i = 0; i < hand.length; i++) {
-		s += "<li><img class='card' src='/images/cards/" + hand[i].number + "-" + hand[i].color + ".png' /></li>";
+		s += "<li><img class='card' src='/images/cards/" + hand[i].number + "-" + hand[i].color + ".png' />";
+		// put all the information we know about possibilities for the card in one place
+		s += "<div class='knowledge'>";
+		for (var j=0, classList = getKnowledgeClasses(hand[i]); j < classList.length; j++) {
+			var knowledgeClass = classList[j];
+			s += "<div class='" + knowledgeClass +"'></div>"
+		}
+		s += "</div>";
+		s += "</li>";
 
 	}
 	s += "</ul>";
@@ -27,7 +49,15 @@ function setupHand(hand, parent) {
 function setupMyHand(hand, parent) {
 	var s = "<ul>";
 	for (var i = 0; i < hand.length; i++) {
-		s += "<li><div class='card' >???</div></li>";
+		s += "<li><div class='card' >???</div>";
+		// put all the information we know about possibilities for the card in one place
+		s += "<div class='knowledge'>";
+		for (var j=0, classList = getKnowledgeClasses(hand[i]); j < classList.length; j++) {
+			var knowledgeClass = classList[j];
+			s += "<div class='" + knowledgeClass +"'></div>"
+		}
+		s += "</div>";
+		s += "</li>";
 	}
 	s += "</ul>";
 	parent.innerHTML = s;
@@ -61,6 +91,8 @@ function updateScreen(game){
 window.onload = function(){
 	var game = createDummyGame(4);
 	updateScreen(game)
+	// for debug perposes, make the game globally accessible
+	window.gameObject = game;
 
 };
 </script>
@@ -125,6 +157,70 @@ window.onload = function(){
 		font-weight: bold;
 		font-family: sans-serif;
 		text-shadow: 0px 0px 4px #00FF21;
+	}
+
+	/* potential knowledge classes */
+	.knowledge:before {
+		content: 'Could Be:';
+		font-size: small;
+		font-style: italic;
+		font-family: sans-serif;
+	}
+	.maybe-red:after {
+		content: 'Red';
+		display: block;
+		color: red;
+	}
+	.maybe-blue:after {
+		content: 'Blue';
+		display: block;
+		color: blue;
+	}
+	.maybe-green:after {
+		content: 'Green';
+		display: block;
+		color: green;
+	}
+	.maybe-black:after {
+		content: 'Black';
+		display: block;
+		color: black;
+	}
+	.maybe-yellow:after {
+		content: 'Yellow';
+		display: block;
+		color: yellow;
+	}
+	.maybe-1, .maybe-2, .maybe-3, .maybe-4, .maybe-5 {
+		display: inline;
+		margin-right: 3px;
+	}
+	.maybe-2:after {
+		content: '2';
+	}
+	.maybe-3:after {
+		content: '3';
+	}
+	.maybe-4:after {
+		content: '4';
+	}
+	.maybe-5:after {
+		content: '5';
+	}
+	.maybe-1:after {
+		content: '1';
+	}
+	.maybe-2:after {
+		content: '2';
+	}
+	.maybe-3:after {
+		content: '3';
+	}
+	.maybe-4:after {
+		content: '4';
+	}
+	.maybe-5:after {
+		content: '5';
 	}
 </style>
 
