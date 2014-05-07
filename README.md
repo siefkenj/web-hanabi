@@ -19,7 +19,7 @@ access `localhost:3000` from your web browser.
 Files listed under the `public/` directory are served
 statically.
   * `websockets_test.html`:
-	 Navigate to `localhost:3000/websockets_test.html`
+	 Navigate to `localhost:3000/tests/websockets_test.html`
 	 to test the websockets code.  If you navigate
 	 to that page from several different browser windows
 	 and click the 'Send Random Message' button,
@@ -28,4 +28,4 @@ statically.
 
 	 If you want to see syncronization between different
 	 computers, navigate a browser on another computer
-	 to `<your IP>:3000/websockets_test.html`
+	 to `<your IP>:3000/tests/websockets_test.html`
