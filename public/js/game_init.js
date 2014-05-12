@@ -44,18 +44,6 @@ function createNewGame(numPlayers) {
         lastAction: null
     };
 
-    for (var i = 0; i < game.deck.length; i++) {
-        var card = game.deck[i];
-        if (card.number == 1) {
-	    var temp = game.deck.splice(i, 1);
-            game.tableau.push(temp[0]);
-            // just play a single one, then we're done
-            break;
-        }
-    }
-	
-
-
     // populate each player's hand
     var handSize = numPlayers <= 3 ? 5 : 4;
     for (var i = 0; i < numPlayers; i++) {
@@ -74,12 +62,5 @@ function createNewGame(numPlayers) {
 /* create a game object for testing purposes */
 function createDummyGame (numPlayers) {
     var game = createNewGame(numPlayers);
-
-    // put a few cards in the discard
-
-    //game.discard = game.deck.splice(0,3);
-
-    // see if there is a one in the deck, and if so, put it on the tableau
-
     return game;
 }
