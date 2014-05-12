@@ -35,14 +35,26 @@ function createNewGame(numPlayers) {
     var game = {
         players: [],
         deck: shuffle(deck),
-        discard: [],
-        tableau: [{}],
+        discard: [ [],[],[],[],[],[] ],
+        tableau: [],
         clueTokens: 5,
         maxClueTokens: 8,
         hearts: 3,
         currentPlayer: null,
         lastAction: null
     };
+
+    for (var i = 0; i < game.deck.length; i++) {
+        var card = game.deck[i];
+        if (card.number == 1) {
+	    var temp = game.deck.splice(i, 1);
+            game.tableau.push(temp[0]);
+            // just play a single one, then we're done
+            break;
+        }
+    }
+	
+
 
     // populate each player's hand
     var handSize = numPlayers <= 3 ? 5 : 4;
@@ -64,17 +76,10 @@ function createDummyGame (numPlayers) {
     var game = createNewGame(numPlayers);
 
     // put a few cards in the discard
-    game.discard = game.deck.splice(0,3);
+
+    //game.discard = game.deck.splice(0,3);
+
     // see if there is a one in the deck, and if so, put it on the tableau
-    for (var i = 0; i < game.deck.length; i++) {
-        var card = game.deck[i];
-        if (card.number == 1) {
-            game.tableau[card.color] = (game.tableau[card.color] || []).push(card);
-            game.deck.splice(i, 1);
-            // just play a single one, then we're done
-            break;
-        }
-    }
 
     return game;
 }
