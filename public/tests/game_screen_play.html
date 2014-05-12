@@ -19,6 +19,7 @@ function getPlayerById(game, id) {
 
 var myId = game.players[0].id;
 var others = game.players.slice(1);
+var inAction = false;
 
 // set up the active players hand
 var me = getPlayerById(game, myId);
@@ -84,7 +85,7 @@ function setupCards(hand, parent) {
 		for (var i = 0; i < hand.length; i++) {
 			if(hand[i]){
 				for (var j = 0; j < hand[i].length; j++){
-					s += "<li><img class='card' src='/images/cards/" + hand[i][j].number + "-" + hand[i][j].color + ".png' />";
+					s += "<li><img class='card' src='/images/cards/" + hand[i][j].number + "-" + hand[i][j]	.color + ".png' />";
 					s += "</div>";
 					s += "</li>";
 				}
@@ -123,8 +124,8 @@ function setupMyHand(hand, parent) {
 	var s = "<ul>";
 	for (var i = 0; i < hand.length; i++) {
 		//uncomment this line and comment the one below it to see the card displayed
-		//s += "<li><img class='card' src='/images/cards/" + hand[i].number + "-" + hand[i].color + ".png' title=" + i + " />";
-		s += "<li><div class='card' title =" + i + ">???</div>"
+		s += "<li><img class='card' src='/images/cards/" + hand[i].number + "-" + hand[i].color + ".png' title=" + i + " />";
+		//s += "<li><div class='card' title =" + i + ">???</div>"
 		// put all the information we know about possibilities for the card in one place
 		s += "<div class='knowledge'>";
 		for (var j=0, classList = getKnowledgeClasses(hand[i]); j < classList.length; j++) {
@@ -138,9 +139,49 @@ function setupMyHand(hand, parent) {
 	parent.innerHTML = s;
 }
 
+// plays the selected card
+function play(event){
+	if(me.hand.length != 0){
+		var cardNumber = event.currentTarget.title;
+		console.log(cardNumber);
+		var cards = document.querySelectorAll('#myHand .card');
+ 		for (var i=0; i < cards.length; i++) {
+			cards[i].removeEventListener('click', Discard);
+		}
+		playedCard = me.hand.splice(cardNumber, 1)[0];	
+		cardNum = game.tableau[sortColor(playedCard.color)].length;
+		if(playedCard.number == cardNum + 1){
+			addSort(playedCard, game.tableau);
+		}else{
+			if(game.hearts > 0) game.hearts--;
+			addSort(playedCard, game.discard);
+		}
+		me.hand.push(game.deck.pop());
+		updateScreen(game);
+		document.body.style.background = "white";
+		inAction = false;
+	}
+}
+
+// begins when button is pushed and adds event listners to the cards in your hand
+function playCard(){
+	var cards = document.querySelectorAll('#myHand .handContents .card')
+	document.body.style.background = "green";
+	if(inAction){
+		for (var i=0; i < cards.length; i++) {
+			cards[i].removeEventListener('click', Discard);
+		}
+	}
+	inAction = true;
+	for (var i=0; i < cards.length; i++) {
+		var card = cards[i];
+		card.addEventListener('click', play);
+	}
+}
+
 //discard from the hand checks if there are any cards left in the hand before running
 function Discard(event){
-	if(me.hand.length != null){
+	if(me.hand.length != 0){
 		var cardNumber = event.currentTarget.title;
 		console.log(cardNumber);
 		var cards = document.querySelectorAll('#myHand .card');
@@ -152,6 +193,7 @@ function Discard(event){
 		if(game.clueTokens < 8) game.clueTokens++;
 		updateScreen(game);
 		document.body.style.background = "white";
+		inAction = false;
 	}
 }
 
@@ -159,6 +201,12 @@ function Discard(event){
 //Discard a card will have to change code once proper player is selected
 function discardCard(){
 	var cards = document.querySelectorAll('#myHand .handContents .card')
+	if(inAction){
+		for (var i=0; i < cards.length; i++) {
+			cards[i].removeEventListener('click', play);
+		}
+	}
+	inAction = true;
 	document.body.style.background = "red";
 	for (var i=0; i < cards.length; i++) {
 		var card = cards[i];
@@ -196,7 +244,8 @@ window.onload = function(){
 
 	//possible instructions
 	//make the discard button work 
-	document.querySelector('#discardCard').addEventListener('click', discardCard);
+	document.querySelector('#discardCard').addEventListener('click', discardCard); 
+	document.querySelector('#playCard').addEventListener('click', playCard)
 };
 </script>
 <style>
@@ -343,11 +392,12 @@ window.onload = function(){
 </head>
 <body>
 	<h1>Hanabi</h1>
-	<div id="tableau">tableu</div>
+	<div id="tableau" class= "handDisplay">tableu</div>
 	<div id="myHand" class="handDisplay">myHand
 		<h4 class="playerName"></h4><div class="handContents"></div>
 	</div>
 	<div id="discardCard" class = "instruction"><button>Discard a Card</button></div>
+	<div id="playCard" class = "instruction"><button>Play a Card</button></div>
 	<div id="othersHands">othersHands
 		<div id="other0" class="handDisplay">other1
 			<h4 class="playerName"></h4>
@@ -365,7 +415,6 @@ window.onload = function(){
 	<div id="discard" class="discardDisplay">discard</div>
 
 	<div id="giveClue" class = "instruction"><button>Give a Clue</button></div>
-	<div id="playCard" class = "instruction"><button>Play a Card</button></div>
 
 	
 </body>
