@@ -1,0 +1,372 @@
+<!doctype html>
+<html>
+<head>
+<script src="/js/game_init.js"></script>
+<script>
+var game = createDummyGame(4);
+function getPlayerById(game, id) {
+	for (var i = 0; i < game.players.length; i++) {
+		if (game.players[i].id == id) {
+			return game.players[i];
+		}
+	}
+}
+
+// moved this from the individual functions it assumes we are the first player we need to make the names the same in order for the 
+	//discard
+	//updateScreen
+//functions to work, if you make a functions that requires this information make sure to add it here
+
+var myId = game.players[0].id;
+var others = game.players.slice(1);
+
+// set up the active players hand
+var me = getPlayerById(game, myId);
+
+// returns a list of classes corresponding to
+// what is known about this card
+function getKnowledgeClasses(card) {
+	var possibleKnowledge = ['red','green','blue','yellow','black','1','2','3','4','5'];
+	var ret = [];
+	for (var i = 0; i < possibleKnowledge.length; i++) {
+		var possibility = possibleKnowledge[i];
+		if (!(possibility in card.impossible)) {
+			ret.push("maybe-" + possibility);
+		}
+	}
+	return ret;
+}
+
+//enumerate sorting sorting {[blue], [red], [yellow], [green], [black]
+function sortColor(color){
+	if (color == 'blue')
+		return 0;
+	if (color == 'red')
+		return 1;
+	if (color == 'yellow')
+		return 2
+	if (color == 'green')
+		return 3
+	if (color == 'black')
+		return 4;
+	// if we include a rainbow color
+	else
+		return 5;
+		
+}
+
+//sorts in order into arrays by their color
+//assumes the sort destination is already set up to be sorted
+// in our case it can only be used on tableau and discard
+function addSort(card, sortdestination){
+	//insert into the appropriate part of the array
+	var toSort = sortdestination[sortColor(card.color)];
+	toSort.push(card);
+    	var swapped;
+    	do {
+        	swapped = false;
+	        for (var i=0; i < toSort.length-1; i++) {
+	            if (toSort[i].number > toSort[i+1].number) {
+	                temp = toSort[i];
+	                toSort[i] = toSort[i+1];
+	                toSort[i+1] = temp;
+	                swapped = true;
+	            }
+        }
+    } while (swapped);
+}
+
+
+// generates the discard pile and the tableau
+function setupCards(hand, parent) {
+	var s = "<ul>";
+	if(hand){
+		for (var i = 0; i < hand.length; i++) {
+			if(hand[i]){
+				for (var j = 0; j < hand[i].length; j++){
+					s += "<li><img class='card' src='/images/cards/" + hand[i][j].number + "-" + hand[i][j].color + ".png' />";
+					s += "</div>";
+					s += "</li>";
+				}
+	}
+		}
+	}
+	s += "</ul>";
+	parent.innerHTML = s;
+}
+
+// hand is the players hand, parent is the div
+// that all the cards should be displayed in.
+function setupHand(hand, parent) {
+	var s = "<ul>";
+	for (var i = 0; i < hand.length; i++) {
+		s += "<li><img class='card' src='/images/cards/" + hand[i].number + "-" + hand[i].color + ".png' />";
+		// put all the information we know about possibilities for the card in one place
+		s += "<div class='knowledge'>";
+		for (var j=0, classList = getKnowledgeClasses(hand[i]); j < classList.length; j++) {
+			var knowledgeClass = classList[j];
+			s += "<div class='" + knowledgeClass +"'></div>"
+		}
+		s += "</div>";
+		s += "</li>";
+
+	}
+	s += "</ul>";
+	parent.innerHTML = s;
+}
+// hand is the players hand, parent is the div
+// that all the cards should be displayed in
+
+// might be a better way to do this without using the title as the position but I couldnt see it
+
+function setupMyHand(hand, parent) {
+	var s = "<ul>";
+	for (var i = 0; i < hand.length; i++) {
+		//uncomment this line and comment the one below it to see the card displayed
+		//s += "<li><img class='card' src='/images/cards/" + hand[i].number + "-" + hand[i].color + ".png' title=" + i + " />";
+		s += "<li><div class='card' title =" + i + ">???</div>"
+		// put all the information we know about possibilities for the card in one place
+		s += "<div class='knowledge'>";
+		for (var j=0, classList = getKnowledgeClasses(hand[i]); j < classList.length; j++) {
+			var knowledgeClass = classList[j];
+			s += "<div class='" + knowledgeClass +"'></div>"
+		}
+		s += "</div>";
+		s += "</li>";
+	}
+	s += "</ul>";
+	parent.innerHTML = s;
+}
+
+//discard from the hand checks if there are any cards left in the hand before running
+function Discard(event){
+	if(me.hand.length != null){
+		var cardNumber = event.currentTarget.title;
+		console.log(cardNumber);
+		var cards = document.querySelectorAll('#myHand .card');
+ 		for (var i=0; i < cards.length; i++) {
+			cards[i].removeEventListener('click', Discard);
+		}
+		addSort(me.hand.splice(cardNumber, 1)[0], game.discard);
+		me.hand.push(game.deck.pop());
+		if(game.clueTokens < 8) game.clueTokens++;
+		updateScreen(game);
+		document.body.style.background = "white";
+	}
+}
+
+
+//Discard a card will have to change code once proper player is selected
+function discardCard(){
+	var cards = document.querySelectorAll('#myHand .handContents .card')
+	document.body.style.background = "red";
+	for (var i=0; i < cards.length; i++) {
+		var card = cards[i];
+		card.addEventListener('click', Discard);
+	}
+}
+
+//updates all data on the screen others variable is global and should be defined properly before project is done
+function updateScreen(game){
+	//setup your hand
+	setupMyHand(me.hand, document.querySelector('#myHand .handContents'));
+	// set up the other player's hands
+	for (var i = 0; i < others.length; i++) {
+		var other = others[i];
+			document.querySelector('#other' + i + ' .playerName').textContent = other.name;
+		setupHand(other.hand, document.querySelector('#other' + i + ' .handContents'));
+	}
+
+	// display the heart tokens
+	document.querySelector('.heartsDisplay').innerHTML = game.hearts;
+	// display the clue tokens
+	document.querySelector('.cluesDisplay').innerHTML = game.clueTokens;
+	// display the discard hand
+	setupCards(game.discard,  document.querySelector('#discard'));
+	setupCards(game.tableau,  document.querySelector('#tableau'));
+}
+	
+
+
+window.onload = function(){
+
+	updateScreen(game)
+	// for debug perposes, make the game globally accessible
+	window.gameObject = game;
+
+	//possible instructions
+	//make the discard button work 
+	document.querySelector('#discardCard').addEventListener('click', discardCard);
+};
+</script>
+<style>
+	.handDisplay {
+		min-height: 100px;
+		background: #aaa;
+		margin: 5px;
+		display: inline-block;
+	}
+	.handDisplay li {
+		display: inline-block;
+		margin: 5px;
+	}
+	.discardDisplay {
+		min-height: 100px;
+		background: #aaa;
+		margin: 5px;
+		display: inline-block;
+	}
+	.discardDisplay li {
+		display: inline-block;
+		margin: 5px;
+	}
+
+	.card {
+		background: #fff;
+		border-radius: 10px;
+		border: 1px solid #555;
+		transition: box-shadow .2s;
+		width: 80px;
+		height: 125px;
+	}
+	.card:hover {
+		box-shadow: 0px 0px 10px #444;
+	}
+
+	.card.selected {
+		box-shadow: 0px 0px 5px #00f;
+	}
+	.card.selected:hover {
+		box-shadow: 0px 0px 10px #00f;
+	}
+	#hearts {
+		background-image: url('../images/heart.svg');
+		width: 100px;
+		height: 100px;
+		background-size: 100% 100%;
+		position: relative;
+	}
+	#hearts .heartsDisplay {
+		color: white;
+		font-size: 30px;
+		padding-top: 30%;
+		text-align: center;
+		font-weight: bold;
+		font-family: sans-serif;
+		text-shadow: 0px 0px 4px #faa;
+	}
+	#clues {
+		background-image: url('../images/clues.png');
+		width: 100px;
+		height: 100px;
+		background-size: 100% 100%;
+		position: relative;
+	}
+	#clues .cluesDisplay {
+		color: white;
+		font-size: 30px;
+		padding-top: 30%;
+		text-align: center;
+		font-weight: bold;
+		font-family: sans-serif;
+		text-shadow: 0px 0px 4px #00FF21;
+	}
+
+	/* potential knowledge classes */
+	.knowledge:before {
+		content: 'Could Be:';
+		font-size: small;
+		font-style: italic;
+		font-family: sans-serif;
+	}
+	.maybe-red:after {
+		content: 'Red';
+		display: block;
+		color: red;
+	}
+	.maybe-blue:after {
+		content: 'Blue';
+		display: block;
+		color: blue;
+	}
+	.maybe-green:after {
+		content: 'Green';
+		display: block;
+		color: green;
+	}
+	.maybe-black:after {
+		content: 'Black';
+		display: block;
+		color: black;
+	}
+	.maybe-yellow:after {
+		content: 'Yellow';
+		display: block;
+		color: yellow;
+	}
+	.maybe-1, .maybe-2, .maybe-3, .maybe-4, .maybe-5 {
+		display: inline;
+		margin-right: 3px;
+	}
+	.maybe-2:after {
+		content: '2';
+	}
+	.maybe-3:after {
+		content: '3';
+	}
+	.maybe-4:after {
+		content: '4';
+	}
+	.maybe-5:after {
+		content: '5';
+	}
+	.maybe-1:after {
+		content: '1';
+	}
+	.maybe-2:after {
+		content: '2';
+	}
+	.maybe-3:after {
+		content: '3';
+	}
+	.maybe-4:after {
+		content: '4';
+	}
+	.maybe-5:after {
+		content: '5';
+	}
+
+	.instruction {
+	}
+</style>
+
+</head>
+<body>
+	<h1>Hanabi</h1>
+	<div id="tableau">tableu</div>
+	<div id="myHand" class="handDisplay">myHand
+		<h4 class="playerName"></h4><div class="handContents"></div>
+	</div>
+	<div id="discardCard" class = "instruction"><button>Discard a Card</button></div>
+	<div id="othersHands">othersHands
+		<div id="other0" class="handDisplay">other1
+			<h4 class="playerName"></h4>
+			<div class="handContents"></div>
+		</div>
+		<div id="other1" class="handDisplay">other2
+			<h4 class="playerName"></h4><div class="handContents"></div>
+		</div>
+		<div id="other2" class="handDisplay">other3
+			<h4 class="playerName"></h4><div class="handContents"></div>
+		</div>
+	</div>
+	<div id="hearts"><div class="heartsDisplay"></div></div>
+	<div id="clues"><div class="cluesDisplay"></div></div>
+	<div id="discard" class="discardDisplay">discard</div>
+
+	<div id="giveClue" class = "instruction"><button>Give a Clue</button></div>
+	<div id="playCard" class = "instruction"><button>Play a Card</button></div>
+
+	
+</body>
+</html>
