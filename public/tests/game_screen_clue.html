@@ -79,7 +79,7 @@ function myHandAction(event){
 	s += "<li class='discardCard' title =" + target + ">Discard Card</li>";
 	s += "<li class= 'cancel'>Cancel</li><ul>";
 
-	instructions = document.querySelector('#instruction')
+	var instructions = document.querySelector('#instruction')
 	instructions.innerHTML = s;
 	addInstructionListner();		
 }
