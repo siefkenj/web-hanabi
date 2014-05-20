@@ -3,6 +3,7 @@
 <head>
 <script src="/js/game_init.js"></script>
 <script>
+"use strict"
 var game = createDummyGame(4);
 function getPlayerById(game, id) {
 	for (var i = 0; i < game.players.length; i++) {
@@ -19,8 +20,6 @@ function getPlayerById(game, id) {
 
 var myId = game.players[0].id;
 var others = game.players.slice(1);
-var inAction = false;
-var giveClue = false;
 
 // set up the active players hand
 var me = getPlayerById(game, myId);
@@ -31,10 +30,10 @@ var me = getPlayerById(game, myId);
 //if a card in another players hand is clicked then the option to give clues comes up
 function clue(event){
 	var target = event.currentTarget;
-	cardname = (target.src.replace(/^.*[\\\/]/, '')).replace(/.png/, '');
-	cardNumber = cardname.substring(0,1)	
-	cardColor = cardname.substring(2)
-	s = "";
+	var cardname = (target.src.replace(/^.*[\\\/]/, '')).replace(/.png/, '');
+	var cardNumber = cardname.substring(0,1)	
+	var cardColor = cardname.substring(2);
+	var s = "";
 	s += "<ul><li class='tellColor' title="+ target.title.substring(5) + ">Tell " + cardColor + "</li>";
 	s += "<li class='tellNumber' title=" + target.title.substring(5) + ">Tell " + cardNumber + "</li>";
 	s += "<li class= 'cancel'>Cancel</li><ul>";
@@ -44,9 +43,9 @@ function clue(event){
 }
 
 function setKnowledgeColor(event){
-	target = event.currentTarget;
-	player = target.title;
-	info = target.innerHTML.substring(5);
+	var target = event.currentTarget;
+	var player = target.title;
+	var info = target.innerHTML.substring(5);
 	for (var i = 0; i < others[player].hand.length;i++){
 		if(others[player].hand[i].color != info){
 			others[player].hand[i].impossible.push(info);
@@ -58,9 +57,9 @@ function setKnowledgeColor(event){
 }
 
 function setKnowledgeNumber(event){
-	target = event.currentTarget;
-	player = target.title;
-	info = target.innerHTML.substring(5);
+	var target = event.currentTarget;
+	var player = target.title;
+	var info = target.innerHTML.substring(5);
 	for (var i = 0; i < others[player].hand.length;i++){
 		if(others[player].hand[i].number != info){
 			others[player].hand[i].impossible.push(info);
@@ -75,7 +74,7 @@ function setKnowledgeNumber(event){
 function myHandAction(event){
 	var target = event.currentTarget.title;
 	console.log(target);
-	s = "";
+	var s = "";
 	s += "<ul><li class='playCard' title =" + target + ">Play Card</li>";
 	s += "<li class='discardCard' title =" + target + ">Discard Card</li>";
 	s += "<li class= 'cancel'>Cancel</li><ul>";
@@ -90,8 +89,8 @@ function play(event){
 
 	if(me.hand.length != 0){
 		var cardNumber = event.currentTarget.title;
-		playedCard = me.hand.splice(cardNumber, 1)[0];	
-		cardNum = game.tableau[sortColor(playedCard.color)].length;
+		var playedCard = me.hand.splice(cardNumber, 1)[0];	
+		var cardNum = game.tableau[sortColor(playedCard.color)].length;
 		if(playedCard.number == cardNum + 1){
 			addSort(playedCard, game.tableau);
 		}else{
@@ -130,7 +129,7 @@ function addInstructionListner(){
 }
 
 function clearInstructions(){
-	s = '';
+	var s = '';
 	document.querySelector('#instruction').innerHTML = s;
 }
 
@@ -179,7 +178,7 @@ function addSort(card, sortdestination){
         	swapped = false;
 	        for (var i=0; i < toSort.length-1; i++) {
 	            if (toSort[i].number > toSort[i+1].number) {
-	                temp = toSort[i];
+	                var temp = toSort[i];
 	                toSort[i] = toSort[i+1];
 	                toSort[i+1] = temp;
 	                swapped = true;
@@ -256,7 +255,7 @@ function reposition(){
 		var ScrollTop
 			if (window.pageYOffset){
 				ScrollTop = window.pageYOffset;
-				temp = ScrollTop;
+				var temp = ScrollTop;
 				el.style.top = temp  + "px";
 			}
 			
@@ -281,7 +280,7 @@ function updateScreen(game){
 	setupCards(game.discard,  document.querySelector('#discard'));
 	setupCards(game.tableau,  document.querySelector('#tableau'));
 	//could put some sort of toggle here to make these only happen if it is your turn.
-	cards = document.querySelectorAll('#myHand .handContents .card')
+	var cards = document.querySelectorAll('#myHand .handContents .card')
 	for (var i=0; i < cards.length; i++) {
 		var card = cards[i];
 		card.addEventListener('click', myHandAction);
