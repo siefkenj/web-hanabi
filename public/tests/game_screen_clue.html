@@ -34,14 +34,41 @@ function clue(event){
 	cardname = (target.src.replace(/^.*[\\\/]/, '')).replace(/.png/, '');
 	cardNumber = cardname.substring(0,1)	
 	cardColor = cardname.substring(2)
-	console.log(cardNumber);
 	s = "";
-	s += "<ul><li class='tellColor' title="+ cardColor +">Tell " + cardColor + "'s</li>";
-	s += "<li class='tellNumber'>Tell " + cardNumber + "'s</li>";
+	s += "<ul><li class='tellColor' title="+ target.title.substring(5) + ">Tell " + cardColor + "</li>";
+	s += "<li class='tellNumber' title=" + target.title.substring(5) + ">Tell " + cardNumber + "</li>";
 	s += "<li class= 'cancel'>Cancel</li><ul>";
 	document.querySelector('#instruction').innerHTML = s;
 	document.querySelector('.tellColor').style.background = cardColor;
 	addInstructionListner();
+}
+
+function setKnowledgeColor(event){
+	target = event.currentTarget;
+	player = target.title;
+	info = target.innerHTML.substring(5);
+	for (var i = 0; i < others[player].hand.length;i++){
+		if(others[player].hand[i].color != info){
+			others[player].hand[i].impossible.push(info);
+			console.log(others[player].hand[i].impossible);
+		}
+	}
+	updateScreen(game);
+	clearInstructions();
+}
+
+function setKnowledgeNumber(event){
+	target = event.currentTarget;
+	player = target.title;
+	info = target.innerHTML.substring(5);
+	for (var i = 0; i < others[player].hand.length;i++){
+		if(others[player].hand[i].number != info){
+			others[player].hand[i].impossible.push(info);
+			console.log(others[player].hand[i].impossible);
+		}
+	}
+	updateScreen(game);
+	clearInstructions();
 }
 
 //When a card in your hand is clicked it draws the discard and play options to the screen
@@ -91,9 +118,9 @@ function Discard(event){
 
 function addInstructionListner(){
 	if (document.querySelector('.tellNumber'))
-		document.querySelector('.tellNumber').addEventListener('click', clearInstructions);
+		document.querySelector('.tellNumber').addEventListener('click',  setKnowledgeNumber);
 	if (document.querySelector('.tellColor'))
-		document.querySelector('.tellColor').addEventListener('click', clearInstructions);
+		document.querySelector('.tellColor').addEventListener('click', setKnowledgeColor);
 	if(document.querySelector('.discardCard'))
 		document.querySelector('.discardCard').addEventListener('click', Discard);
         if (document.querySelector('.playCard'))
@@ -121,15 +148,16 @@ function getKnowledgeClasses(card) {
 	return ret;
 }
 
-//enumerate sorting sorting {[blue], [red], [yellow], [green], [black]
+//enumerate sorting sorting {[red], [green], [blue], [yellow], [black]
+//could be probably be an enumeration if that is supported...
 function sortColor(color){
-	if (color == 'blue')
-		return 0;
 	if (color == 'red')
-		return 1;
-	if (color == 'yellow')
-		return 2
+		return 0;
 	if (color == 'green')
+		return 1;
+	if (color == 'blue')
+		return 2
+	if (color == 'yellow')
 		return 3
 	if (color == 'black')
 		return 4;
@@ -184,7 +212,7 @@ function setupCards(hand, parent) {
 function setupHand(hand, parent) {
 	var s = "<ul>";
 	for (var i = 0; i < hand.length; i++) {
-		s += "<li><img class='card' src='/images/cards/" + hand[i].number + "-" + hand[i].color + ".png' title=" + i + " />";
+		s += "<li><img class='card' src='/images/cards/" + hand[i].number + "-" + hand[i].color + ".png' title=" + parent.parentNode.id + " />";
 		// put all the information we know about possibilities for the card in one place
 		s += "<div class='knowledge'>";
 		for (var j=0, classList = getKnowledgeClasses(hand[i]); j < classList.length; j++) {
@@ -221,6 +249,19 @@ function setupMyHand(hand, parent) {
 	parent.innerHTML = s;
 }
 
+
+//responsible for moving the instruction elements on the screen
+function reposition(){
+		var el = document.querySelector('.instructionDisplay');	
+		var ScrollTop
+			if (window.pageYOffset){
+				ScrollTop = window.pageYOffset;
+				temp = ScrollTop;
+				el.style.top = temp  + "px";
+			}
+			
+}
+
 //updates all data on the screen others variable is global and should be defined properly before project is done
 function updateScreen(game){
 	//setup your hand
@@ -250,23 +291,8 @@ function updateScreen(game){
 		var card = cards[i];
 		card.addEventListener('click', clue);
 	}
+	 reposition();
 }
-
-//responsible for moving the instruction elements on the screen
-function reposition(){
-		var el = document.querySelector('.instructionDisplay');
-			
-		var ScrollTop = document.body.scrollTop;
-		console.log(ScrollTop);
-		if (ScrollTop == 0){
-			if (window.pageYOffset)
-				ScrollTop = window.pageYOffset;
-			else
-				ScrollTop = (document.body.parentElement) ? document.body.parentElement.scrollTop : 0;
-		}
-			el.style.top = screen.height - 300 + ScrollTop + "px";
-}
-	
 
 
 window.onload = function(){
@@ -412,29 +438,24 @@ window.onload = function(){
 	.maybe-5:after {
 		content: '5';
 	}
-
-	.instructionDisplay {
-		left: 10
+	.instructionDisplay li {
+		display: inline-block;
+		margin-right:20px;
+		width:220px;
+		padding:10px;
+		border:2px solid black;
+		background-color: white;
 		z-index:1;
 		font-size: 30px;
 		background: 'white';
 		border: 'black'
-	}
-	.instructionDisplay li {
-		display: inline-block;
-		margin: 50px;
-		width:220px;
-		padding:10px;
-		border:2px solid black;
-		background-color: white ;
-		top: 200;
 	}
 
 	#instruction { 
 		position: absolute; 
 	}		
 	pre.instruction { 
-			overflow:auto;
+			overflow:hidden;
 			border-left:1px dashed #000;
 			border-right:1px dashed #000;
 			padding-left:2px; 
