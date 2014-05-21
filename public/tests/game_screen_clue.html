@@ -44,28 +44,45 @@ function clue(event){
 
 function setKnowledgeColor(event){
 	var target = event.currentTarget;
-	var player = target.title;
+	var player = others[target.title];
 	var info = target.innerHTML.substring(5);
-	for (var i = 0; i < others[player].hand.length;i++){
-		if(others[player].hand[i].color != info){
-			others[player].hand[i].impossible.push(info);
-			console.log(others[player].hand[i].impossible);
+	for (var i = 0; i < player.hand.length;i++){
+		if(player.hand[i].color != info){
+			player.hand[i].impossible.push(info);
+		}else{
+			var possibleKnowledge = ['red','green','blue','yellow','black'];
+			for(var j = 0; j < possibleKnowledge.length; j++){
+				if (info != possibleKnowledge[j] && player.hand[i].impossible.indexOf(info) == -1){
+					player.hand[i].impossible.push(possibleKnowledge[j]);
+				}
+			}
 		}
 	}
+	if(game.clueTokens > 0)
+		game.clueTokens--;
 	updateScreen(game);
 	clearInstructions();
 }
 
 function setKnowledgeNumber(event){
 	var target = event.currentTarget;
-	var player = target.title;
+	var player = others[target.title];
 	var info = target.innerHTML.substring(5);
-	for (var i = 0; i < others[player].hand.length;i++){
-		if(others[player].hand[i].number != info){
-			others[player].hand[i].impossible.push(info);
-			console.log(others[player].hand[i].impossible);
+	console.log(info);
+	for (var i = 0; i < player.hand.length;i++){
+		if(player.hand[i].number != info){
+			player.hand[i].impossible.push(info);
+		}else{
+			var possibleKnowledge = ['1','2','3','4','5'];
+			for(var j = 0; j < possibleKnowledge.length; j++){
+				if (info != possibleKnowledge[j] && player.hand[i].impossible.indexOf(info) == -1){
+					player.hand[i].impossible.push(possibleKnowledge[j]);
+				}
+			}
 		}
 	}
+	if(game.clueTokens > 0)
+		game.clueTokens--;
 	updateScreen(game);
 	clearInstructions();
 }
@@ -79,7 +96,7 @@ function myHandAction(event){
 	s += "<li class='discardCard' title =" + target + ">Discard Card</li>";
 	s += "<li class= 'cancel'>Cancel</li><ul>";
 
-	instructions = document.querySelector('#instruction')
+	var instructions = document.querySelector('#instruction')
 	instructions.innerHTML = s;
 	addInstructionListner();		
 }
@@ -140,7 +157,7 @@ function getKnowledgeClasses(card) {
 	var ret = [];
 	for (var i = 0; i < possibleKnowledge.length; i++) {
 		var possibility = possibleKnowledge[i];
-		if (!(possibility in card.impossible)) {
+		if ((card.impossible.indexOf(possibility)) == -1) {
 			ret.push("maybe-" + possibility);
 		}
 	}
