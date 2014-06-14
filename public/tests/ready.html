@@ -71,14 +71,14 @@ function parseUriSearchString (str) {
 	});
 	
 	socket.on('room-info', function(data) {
-	
+		var everyoneReady = true;
 		var i;
 		var j;
 		console.log('Room info:', data);
 		messagesDiv.innerHTML = "<div id = 'titles'>Users in the Room:</div>"	
 		
 		for (i = 0; i < data.clients.length; i++){
-			
+			everyoneReady = everyoneReady & !!(data.clients[i].data.readyState)
 			if (data.clients[i].data.readyState == true){
 				messagesDiv.innerHTML += "<span style='color:green;'> &bull;</span>"
 			}else{
@@ -91,6 +91,14 @@ function parseUriSearchString (str) {
 		for (i = 1; i < data.roomList.length; i++){
 			var roomName = data.roomList[i].replace(/^\//, '')
 			messagesDiv.innerHTML += "<a href='?name=" + name + "&room=" + roomName + "' >" + roomName + "</a><br>"
+		}
+
+		// If there is more than one person in the room and everyone
+		// is ready, then let's start the game.
+		if (data.clients.length > 1 && everyoneReady) {
+			console.log('everyone is ready')
+		} else {
+			console.log('not everyone is ready')
 		}
 	
 	});
