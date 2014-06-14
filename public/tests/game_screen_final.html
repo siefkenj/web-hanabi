@@ -250,8 +250,8 @@ function setupMyHand(hand, parent) {
 	var s = "<ul>";
 	for (var i = 0; i < hand.length; i++) {
 		//uncomment this line and comment the one below it to see the card displayed
-		s += "<li><img class='card' src='/images/cards/" + hand[i].number + "-" + hand[i].color + ".png' title=" + i + " />";
-		//s += "<li><div class='card' title =" + i + ">???</div>"
+		//s += "<li><img class='card' src='/images/cards/" + hand[i].number + "-" + hand[i].color + ".png' title=" + i + " />";
+		s += "<li><div class='card' title =" + i + ">???</div>"
 		// put all the information we know about possibilities for the card in one place
 		s += "<div class='knowledge'>";
 		for (var j=0, classList = getKnowledgeClasses(hand[i]); j < classList.length; j++) {

@@ -37,7 +37,7 @@ function createNewGame(numPlayers) {
         deck: shuffle(deck),
         discard: [ [],[],[],[],[],[] ],
         tableau: [ [],[],[],[],[],[] ],
-        clueTokens: 5,
+        clueTokens: 8,
         maxClueTokens: 8,
         hearts: 3,
         currentPlayer: null,
