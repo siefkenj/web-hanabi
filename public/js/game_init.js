@@ -40,10 +40,10 @@ function createNewGame(numPlayers) {
         clueTokens: 8,
         maxClueTokens: 8,
         hearts: 3,
-        currentPlayer: null,
+        currentPlayer: 0,
         lastAction: null
     };
-
+   
     // populate each player's hand
     var handSize = numPlayers <= 3 ? 5 : 4;
     for (var i = 0; i < numPlayers; i++) {
@@ -56,6 +56,11 @@ function createNewGame(numPlayers) {
         });
     }
     
+    //add on cards that are blank to the end of the deck to deal with the final round.
+    for (i = 0; i < 5; i++){
+    	game.deck.unshift({color: 'blank', number: 'blank', impossible: []});
+    }
+
     return game;
 }
 
