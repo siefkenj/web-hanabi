@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Hanabi Lobby</title>
+	<script src="/js/socket.io.js"></script>
+	<script src="/js/game_init.js"></script>
+	<script src="/js/gameplay.js"></script>
+</head>
+<body>
+	<!-- should only be displayed when in the lobby -->
+	<div id="lobby">
+		<div id="wrapper">
+			<h1>Hanabi Lobby</h1>
+			<p> Click on a room to join!<br>Or create a new one!</p>
+			Name: <span id="name" style="color: blue;"></span>
+			Current room: <span id="room" style="color: blue;"></span><br>
+			Set Username: <input type = "text" id="setName"><br>
+			Change room: <input type = "text" id ="roomName"><br>
+			<button id="setUps">Set</button><button id="setReadyState"> I'm Ready! </button>
+		</div>
+		<div id="messages" style="border: 1px solid black;"></div>
+	</div>
+	<!-- should only be displayed when game is active -->
+	<div id="game-screen" style="display: none">
+		<style>
+			.handDisplay {
+				min-height: 100px;
+				background: #aaa;
+				display: inline-block;
+			}
+			.handDisplay li {
+				display: inline-block;
+				margin-right: 5px;
+			}
+			.discardDisplay {
+				min-height: 100px;
+				width 200px;
+				background: #aaa;
+				margin: 5px;
+				display: inline-block;
+			}
+			.discardDisplay li {
+				display: inline-block;
+				margin-right: 5px;
+			}
+			.stacked li{
+				position:relative;
+				display:block;
+			}
+
+			.card {
+				background: #fff;
+				border-radius: 10px;
+				border: 1px solid #555;
+				transition: box-shadow .2s;
+				width: 80px;
+				height: 125px;
+			}
+			
+			.card:hover {
+				box-shadow: 0px 0px 10px #444;
+			}
+
+			.card.selected {
+				box-shadow: 0px 0px 5px #00f;
+			}
+			.card.selected:hover {
+				box-shadow: 0px 0px 10px #00f;
+			}
+			#hearts {
+				background-image: url('../images/heart.svg');
+				width: 100px;
+				height: 100px;
+				background-size: 100% 100%;
+				position: relative;
+			}
+			#hearts .heartsDisplay {
+				color: white;
+				font-size: 30px;
+				padding-top: 30%;
+				text-align: center;
+				font-weight: bold;
+				font-family: sans-serif;
+				text-shadow: 0px 0px 4px #faa;
+			}
+			#clues {
+				background-image: url('../images/clues.png');
+				width: 100px;
+				height: 100px;
+				background-size: 100% 100%;
+				position: relative;
+			}
+			#clues .cluesDisplay {
+				color: white;
+				font-size: 30px;
+				padding-top: 30%;
+				text-align: center;
+				font-weight: bold;
+				font-family: sans-serif;
+				text-shadow: 0px 0px 4px #00FF21;
+			}
+			
+			/* potential knowledge classes */
+			.knowledge{
+				font-size: .9em;
+				text-shadow: 0px 0px 10px black;
+				text-align: center;
+			}
+			.knowledge:before {
+				content: 'Could Be:';
+				font-size: small;
+				font-style: italic;
+				font-family: sans-serif;
+				text-shadow: none;
+			}
+			.maybe-red:after {
+				content: 'Red';
+				display: block;
+				color: red;
+			}
+			.maybe-blue:after {
+				content: 'Blue';
+				display: block;
+				color: blue;
+			}
+			.maybe-green:after {
+				content: 'Green';
+				display: block;
+				color: green;
+			}
+			.maybe-black:after {
+				content: 'Black';
+				display: block;
+				color: black;
+			}
+			.maybe-yellow:after {
+				content: 'Yellow';
+				display: block;
+				color: yellow;
+			}
+			.maybe-1, .maybe-2, .maybe-3, .maybe-4, .maybe-5 {
+				display: inline;
+				margin-right: 3px;
+			}
+			.maybe-2:after {
+				content: '2';
+			}
+			.maybe-3:after {
+				content: '3';
+			}
+			.maybe-4:after {
+				content: '4';
+			}
+			.maybe-5:after {
+				content: '5';
+			}
+			.maybe-1:after {
+				content: '1';
+			}
+			.maybe-2:after {
+				content: '2';
+			}
+			.maybe-3:after {
+				content: '3';
+			}
+			.maybe-4:after {
+				content: '4';
+			}
+			.maybe-5:after {
+				content: '5';
+			}
+			.instructionDisplay li {
+				display: inline-block;
+				margin-right:20px;
+				width:220px;
+				padding:10px;
+				border:2px solid black;
+				background-color: white;
+				z-index:1;
+				font-size: 30px;
+				background: 'white';
+				border: 'black'
+			}
+
+			#instruction { 
+				position: fixed;
+				bottom:0px;
+			}		
+			.tellColor{
+				color: white;
+			}
+			
+			#tableauWrap {
+			display: flex;
+			background-color:#FF9955;
+			margin-left: auto;
+			margin-right: auto;
+			flex-flow: row wrap;
+			justify-content:space-between;
+			height: 750px;
+			}
+			
+			#tableau {
+				background-color: grey;
+				height: 90%;
+				width:75%;
+				margin: auto;
+				border-style: outset;
+				border-width: 10px;
+			}
+			
+			#heartsandclues {
+				display: flex;
+				flex-direction: column;
+				margin-top:auto;
+				margin-bottom:auto;
+			}
+			
+			#discard {
+				background-color: grey;
+				margin-top: auto;
+				margin-bottom: auto;
+				height: 60%;
+				width:10%;
+				margin-right: 10px;
+				border-style: inset;
+				border-color: white;
+			}
+					
+		</style>
+
+		</head>
+			<h1>Hanabi</h1>
+			
+			<div id="tableauWrap">
+				<div id="heartsandclues">
+					<div id="hearts"><div class="heartsDisplay"></div></div>
+					<div id="clues"><div class="cluesDisplay"></div></div></div>
+				<div id="tableau" class="handDisplay"></div>
+				<div id="discard"></div>
+			</div>
+			
+			
+			<div id="myHand" class="handDisplay">My Hand
+				<h4 class="playerName"></h4><div class="handContents"></div>
+			</div>
+			<div id="othersHands">
+				<div id="other0" class="handDisplay">
+					<h4 class="playerName"></h4>
+					<div class="handContents"></div>
+				</div>
+				<div id="other1" class="handDisplay">
+					<h4 class="playerName"></h4><div class="handContents"></div>
+				</div>
+				<div id="other2" class="handDisplay">
+					<h4 class="playerName"></h4><div class="handContents"></div>
+				</div>
+			</div>
+			<div id="instruction" class="instructionDisplay"></div>
+	</div>
+</body>
+<style>
+	
+	#messages {
+		border: 1px solid black;
+		width: 250px;
+		margin-left: auto;
+		margin-right: auto;
+		font-family: calibri;
+		}
+		
+	#titles {
+		text-align: center;
+		font-size: 18px;
+		
+	
+
+</style>
+</html>
