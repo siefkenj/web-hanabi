@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Hanabi Lobby</title>
+	<link href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+<style>
+html {
+	height: 100%;
+}
+body {
+	height: 100%;
+	margin: 0px;
+	padding: 0px;
+	flex-flow: column nowrap;
+	display: flex;
+	background: url("/images/blue-background.jpg");
+	font-family: sans-serif;
+	color: #BCC2DD;
+}
+
+#header {
+	flex: 0 1 auto;
+	text-align: center;
+	margin: 5px;
+	text-shadow: 0 0 5px white;
+	color: black;
+	font-family: sans-serif;
+	font-weight: bold;
+	font-size: 30px;
+}
+hr {
+	height: 1px;
+	border: 0;
+	color: white; 
+	background-image: -webkit-linear-gradient(left, rgba(255,255,255,0), rgba(255,255,255,0.75), rgba(255,255,255,0));
+	background-image: -moz-linear-gradient(left, rgba(255,255,255,0), rgba(255,255,255,0.75), rgba(255,255,255,0));
+	background-image: -ms-linear-gradient(left, rgba(255,255,255,0), rgba(255,255,255,0.75), rgba(255,255,255,0));
+	background-image: -o-linear-gradient(left, rgba(255,255,255,0), rgba(255,255,255,0.75), rgba(255,255,255,0)); 
+	background-image: linear-gradient(left, rgba(255,255,255,0), rgba(255,255,255,0.75), rgba(255,255,255,0)); 
+	margin: 0px;
+	padding: 0px;
+}
+#footer {
+	flex: 0 1 auto;
+	margin: 5px;
+	font-size: smaller;
+}
+#body {
+	flex: 1 1 auto;
+	display: flex;
+	flex-flow: column nowrap;
+}
+#info-row {
+	flex: 0 1 auto;
+}
+#info-row ul {
+	list-style: none;
+	margin-left: 10px;
+}
+#info-row li {
+	display: inline-block;
+	margin-left: 10px;
+	margin-right: 10px;
+	padding-right: 2em;
+	position: relative;
+}
+#info-row .edit {
+	position: absolute;
+	right: 0px;
+}
+#info-row .name, .room {
+	font-weight: bold;
+	color: #FFCB00;
+}
+#info-row .editable {
+	cursor: pointer;
+}
+#info-row .editable:hover {
+	color: orange;
+	border-bottom: 1px solid orange;
+}
+.info-title {
+	font-style: italic;
+	margin-right: 1em;
+}
+#content {
+	margin-left: 10px;
+	margin-right: 10px;
+	flex: 1 1 auto;
+	display: flex;
+	flex-flow: row nowrap;
+	justify-content: center;
+}
+.column {
+	flex: 0 1 auto;
+	display: flex;
+	flex-flow: column nowrap;
+	min-width: 200px;
+}
+.column-title {
+	flex: 0 1 auto;
+	text-align: center;
+}
+.column-container {
+	flex: 1 1 auto;
+	background: rgba(255,255,255,.4);
+	display: flex;
+	flex-flow: column nowrap;
+}
+.column-container.participants {
+	background: rgba(255, 230, 109, 0.61);
+	border-radius: 0px 10px 10px 0px;
+	border: 2px solid #FFCB00;
+}
+.column-container.participants li {
+	background: #856A00;
+}
+.column-container.participants li.ready:after {
+	color: #00E01B;
+	text-shadow: 0 0 2px black;
+	font-size: small;
+	font-style: italic;
+	content: 'Ready';
+	float: right;
+}
+.column-container.participants li.not-ready:after {
+	font-size: small;
+	font-style: italic;
+	content: 'Not Ready';
+	float: right;
+}
+.column-container.rooms li {
+	background: #005AC8;
+}
+.column-container.rooms li:hover {
+	box-shadow: 0px 0px 3px white;
+}
+.column-container.rooms li.joinable:hover:after {
+	font-size: small;
+	font-style: italic;
+	content: 'Join';
+	position: absolute;
+	right: 3px;
+}
+.column-container.rooms {
+	border-radius: 10px 0px 0px 10px;
+}
+.column-container.rooms li {
+	position: relative;
+	text-align: center;
+}
+.column-container ul {
+	list-style: none;
+	padding: 10px 0px 0px 0px;
+	margin: 0px;
+	flex: 1 1 auto;
+}
+.column-container ul.bottom-buttons {
+	flex: 0 1 auto;
+}
+.column-container .bottom-buttons li {
+	position: relative;
+	text-align: center;
+}
+.column-container .bottom-buttons li:hover {
+	box-shadow: 0px 0px 3px white;
+	color: white;
+}
+.column-container li {
+	margin: 0px 10px 10px 10px;
+	padding: 4px;
+	border-radius: 4px;
+	cursor: pointer;
+	box-sizing: boder-box;
+}
+.selected-room {
+	position: relative;
+	border-bottom: 2px solid #FFCB00;
+	border-top: 2px solid #FFCB00;
+}
+.selected-room:after {
+	font-family: 'FontAwesome';
+	display: inline-block;
+	content: '\f053';
+	position: absolute;
+	right: -12px;
+	color: #FFCB00;
+}
+
+</style>
+</head>
+<body>
+	<div id="header">Hanabi Lobby<hr></div>
+	<div id="body">
+		<div id="info-row">
+			<ul>
+				<li><span class="info-title">Name:</span><span class="editable" title="Click to edit"><span class="name">My Name</span><i class="fa fa-edit edit"></i></span></li>
+				<li><span class="info-title">Room:</span><span class="room">My Room</span></li>
+			</ul>
+		</div>
+		<div id="content">
+			<div class="column">
+				<div class="column-title">Rooms</div>
+				<div class="column-container rooms">
+					<ul>
+						<li class="joinable">room 1</li>
+						<li class="joinable">room 2</li>
+						<li class="selected-room">room 3</li>
+						<li class="joinable">room 4</li>
+					</ul>
+					<ul class="bottom-buttons">
+						<li><i class="fa fa-plus-circle" style="position: absolute; left: 10px; bottom: 5px;"></i> New Room</li>
+					</ul>
+				</div>
+			</div>
+			<div class="column">
+				<div class="column-title">Participants</div>
+				<div class="column-container participants">
+					<ul>
+						<li class="ready">person 1</li>
+						<li class="not-ready">person 2</li>
+						<li class="ready">person 4</li>
+					</ul>
+					<ul class="bottom-buttons">
+						<li><i class="fa fa-play-circle" style="position: absolute; left: 10px; bottom: 5px;"></i> Ready</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div id="footer">Sweet game bro!</div>
+</body>
+</html>
