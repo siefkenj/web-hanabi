@@ -97,7 +97,7 @@ function makeElementEditable(elm, callback){
 
 
 window.onload = function () {
-        // grab the name and room from the URI search string, or put
+    // grab the name and room from the URI search string, or put
     // in some defaults if they're not given.
     var args = parseUriSearchString(window.location.search);
     var name = args.name || 'Tom';
