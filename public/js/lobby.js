@@ -1,5 +1,8 @@
 "use strict";
 
+//used for testing everyone ready behaviour.
+var pageRedirect = "/tests/game_screen_play.html";
+
 function parseUriSearchString (str) {
     // Remove leading questionmark
     if (str.charAt(0) == '?') {
@@ -229,7 +232,42 @@ window.onload = function () {
             var client = data.clients[i];
             var readyClassStr = client.data.readyState ? 'ready' : 'not-ready';
             clientsListStr += "<li class='" + readyClassStr + "' x-id='" + client.id + "' x-name='" + client.name + "'>" + client.name + "</li>";
+	    //if everyone ready is still true cueck it against the current players ready state.
+	    if(everyoneReady){
+	    	everyoneReady = client.data.readyState; 
+	    }
+	 }
+
+	 var readyButtonText = document.querySelector('#ready-button .text');
+         var readyButtonIcon = document.querySelector('#ready-button .icon');
+
+	 //controls wether you can exit to a game, cant have too many players, cant have too few
+	 if(data.clients.length < 2){
+	     readyButtonText.textContent = "Not enough player\'s";
+	     readyButtonIcon.classList.remove('fa-pause')
+             readyButtonIcon.classList.remove('fa-play-circle')
+	     document.querySelector('#ready-button').removeEventListener('click', readyClicked);
+	 }else if(data.clients.length > 5){
+             readyButtonText.textContent = "Too many player\'s!!";
+	     readyButtonIcon.classList.remove('fa-pause')
+             readyButtonIcon.classList.remove('fa-play-circle')
+	     document.querySelector('#ready-button').removeEventListener('click', readyClicked);
+	 }else  if (readyState == false){
+            readyButtonText.textContent = "I\'m ready!";
+            readyButtonIcon.classList.add('fa-play-circle')
+            readyButtonIcon.classList.remove('fa-pause')
+	    document.querySelector('#ready-button').addEventListener('click', readyClicked);
+         }else {
+            readyButtonText.textContent = "I\'m not ready!";
+            readyButtonIcon.classList.remove('fa-play-circle')
+            readyButtonIcon.classList.add('fa-pause')
+	    document.querySelector('#ready-button').addEventListener('click', readyClicked);
         }
+  
         document.querySelector('.clients-list').innerHTML = clientsListStr;
+	if(everyoneReady){
+		//define behaviour here, it just forward to another html page now.
+		document.location.href= pageRedirect;	
+	}
     });
 }
