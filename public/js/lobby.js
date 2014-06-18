@@ -1,7 +1,8 @@
 "use strict";
 
 //used for testing everyone ready behaviour.
-var pageRedirect = "/tests/game_screen_play.html";
+var gameHtml = "/tests/game_screen_play.html";
+var pageRedirect = gameHtml;
 
 function parseUriSearchString (str) {
     // Remove leading questionmark
@@ -19,6 +20,7 @@ function parseUriSearchString (str) {
     return ret;
 }
 
+
 // update window.location.search without having the browser refresh
 function updateUriString (vals) {
     var search = [];
@@ -26,7 +28,6 @@ function updateUriString (vals) {
         search.push(encodeURI(k) + "=" + encodeURI(vals[k]));
     }
     var searchString = "?" + search.join('&');
-    
     var newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + searchString;
     window.history.pushState({path: newUrl}, '', newUrl);
 }
@@ -267,6 +268,7 @@ window.onload = function () {
         document.querySelector('.clients-list').innerHTML = clientsListStr;
 	if(everyoneReady){
 		//define behaviour here, it just forward to another html page now.
+		pageRedirect = gameHtml.concat("?name=" + encodeURI(name) + "&room=" + encodeURI(room));
 		document.location.href= pageRedirect;	
 	}
     });
