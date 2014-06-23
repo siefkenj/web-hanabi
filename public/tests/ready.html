@@ -7,21 +7,8 @@
 	<script src="/js/gameplay.js"></script>
 </head>
 <body>
-	<!-- should only be displayed when in the lobby -->
-	<div id="lobby">
-		<div id="wrapper">
-			<h1>Hanabi Lobby</h1>
-			<p> Click on a room to join!<br>Or create a new one!</p>
-			Name: <span id="name" style="color: blue;"></span>
-			Current room: <span id="room" style="color: blue;"></span><br>
-			Set Username: <input type = "text" id="setName"><br>
-			Change room: <input type = "text" id ="roomName"><br>
-			<button id="setUps">Set</button><button id="setReadyState"> I'm Ready! </button>
-		</div>
-		<div id="messages" style="border: 1px solid black;"></div>
-	</div>
 	<!-- should only be displayed when game is active -->
-	<div id="game-screen" style="display: none">
+	<div id="game-screen" >
 		<style>
 			.handDisplay {
 				min-height: 100px;
@@ -42,9 +29,8 @@
 				display: inline-block;
 				margin-right: 5px;
 			}
-			.stacked li{
-				position:relative;
-				display:block;
+			.yellow :nth-child(3){
+				margin-left:-40;
 			}
 
 			.card {
@@ -214,21 +200,4 @@
 			<div id="instruction" class="instructionDisplay"></div>
 	</div>
 </body>
-<style>
-	
-	#messages {
-		border: 1px solid black;
-		width: 250px;
-		margin-left: auto;
-		margin-right: auto;
-		font-family: calibri;
-		}
-		
-	#titles {
-		text-align: center;
-		font-size: 18px;
-		
-	
-
-</style>
 </html>

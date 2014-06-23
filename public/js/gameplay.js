@@ -32,16 +32,12 @@ window.onload = function() {
 	// take a game object game and start the game
 	function startNewGame(game) {
 		console.log('got new game data. starting new game');
-		document.querySelector('#lobby').setAttribute('style', 'display: none')
 		document.querySelector('#game-screen').setAttribute('style', '')
 		gameMode(name, id, game, socket);
 		
 	}
 
 	console.log(args)
-
-	document.querySelector('#name').innerHTML = name;
-	document.querySelector('#room').innerHTML = room;
 	var messagesDiv = document.querySelector('#messages');
 
 	// Set up the web socket
@@ -67,41 +63,10 @@ window.onload = function() {
 	//the rooms are links to the room in question.
 	//
 	
-	var readyState = false;
-	document.querySelector('#setReadyState').addEventListener('click', function () {
-		readyState = !readyState;
-		if (readyState == false){
- 			setReadyState.innerHTML = "I\'m ready!";
- 		}else{
- 			setReadyState.innerHTML = "I\'m not ready!";
- 		}
-		socket.emit('set-data', {readyState: readyState});
-
-	});
-	
 	socket.on('room-info', function(data) {
 		var everyoneReady = true;
 		var i;
 		var j;
-		console.log('Room info:', data);
-		messagesDiv.innerHTML = "<div id = 'titles'>Users in the Room:</div>"	
-		
-		for (i = 0; i < data.clients.length; i++){
-			everyoneReady = everyoneReady & !!(data.clients[i].data.readyState);
-			if (data.clients[i].data.readyState == true){
-				messagesDiv.innerHTML += "<span style='color:green;'> &bull;</span>"
-			}else{
-				messagesDiv.innerHTML += "<span style='color:red;'> &bull;</span>"
-			}
-			messagesDiv.innerHTML += data.clients[i].name + '<br>'
-		}
-		
-		messagesDiv.innerHTML += "<div id = 'titles'>Available rooms:</div>"
-		for (i = 1; i < data.roomList.length; i++){
-			var roomName = data.roomList[i].replace(/^\//, '')
-			messagesDiv.innerHTML += "<a href='?name=" + name + "&room=" + roomName + "' >" + roomName + "</a><br>"
-		}
-
 		// If we are the first person on the list, we are the leader of the room,
 		// so we should start the game.
 		if (name == data.clients[0].name) {
@@ -127,28 +92,6 @@ window.onload = function() {
 		id = data.id;
 	});
 	
-	// change function sets the name to the value in the setname box
-	// it also sets the room to the text in the room box
-	var change = function ()
-	{
-		if (document.querySelector('#setName').value){		
-			name = document.querySelector('#setName').value;
-		}
-		if (document.querySelector('#roomName').value){
-			room = document.querySelector('#roomName').value;
-		}
-		window.location.search = "?name=" + encodeURI(name) + "&room=" + encodeURI(room);
-		socket.emit('set-name', name);
-	}
-
-	// lets the user input using enter
-	var enterData = function (event) 
-	{
-		if(event.keyCode == 13)
-		{
-			change();
-		}
-	}
 
 	//set ups is the button that sets the room and user data when clicked it runs the change function which sets the information in the URL
 	//The 'setname' and 'roomname' functions are for the ability to press enter in either the set name or set room text inputs
@@ -388,17 +331,20 @@ function gameMode(name, id, game, socket) {
 		var s = "<ul>";
 		if(hand){
 			for (var i = 0; i < hand.length; i++) {
-				if(hand[i]){
+				if(hand[i][0]){
+					s += "<div class =" + hand[i][0].color +"><ul>";
 					for (var j = 0; j < hand[i].length; j++){
+					
 						s += "<li><img class='card' src='/images/cards/" + hand[i][j].number + "-" + hand[i][j]	.color + ".png' />";
-						s += "</div>";
 						s += "</li>";
 					}
-		}
+					s+= "</ul></div>";
+				}
 			}
 		}
 		s += "</ul>";
 		parent.innerHTML = s;
+
 	}
 
 	// hand is the players hand, parent is the div

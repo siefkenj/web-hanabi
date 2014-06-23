@@ -135,6 +135,10 @@ io.sockets.on('connection', function(socket) {
         informRoomOfChange(socket.hanabiData.currentRoom);
     });
 
+    socket.on('game-start', function (data){
+    	console.log('this game is starting with ', data);
+    });
+
     // when new data is broadcast by a client, emit it to all
     // other clients in the same room
     socket.on('broadcast', function (data) {
