@@ -106,6 +106,7 @@ window.onload = function () {
     var args = parseUriSearchString(window.location.search);
     var name = args.name || 'Tom';
     var id = null;
+    var persistentId = args.persistentId;
     var room = args.room || 'innercircle';
     if (!args.name || !args.room) {
         window.location.search = "?name=" + encodeURI(name) + "&room=" + encodeURI(room);
@@ -120,7 +121,7 @@ window.onload = function () {
         if (!change) {
             return;
         }
-        updateUriString({name: name, room: room});
+        updateUriString(persistentId ? {name: name, room: room, persistentId: persistentId} : {name: name, room: room});
         try {
             socket.emit('set-name', name);
         } catch (e) {}
@@ -142,7 +143,7 @@ window.onload = function () {
         if (!change) {
             return;
         }
-        updateUriString({name: name, room: room});
+        updateUriString(persistentId ? {name: name, room: room, persistentId: persistentId} : {name: name, room: room});
         try {
             socket.emit('set-room', room);
         } catch (e) {}
@@ -189,12 +190,16 @@ window.onload = function () {
 
     // Set up the web socket
     var socket = io.connect();
+    window.sss = socket;    //for debug
     socket.on('connect', function () {
         console.log('connected');
         // Set our name
         socket.emit('set-name', name);
         // Join the appropriate room as soon as we've connected
         socket.emit('set-room', room);
+        if (persistentId) {
+            socket.emit('assert-id', {persistentId: persistentId});
+        }
         // Get our ID from the server so we know where we
         // show up in the list of people in our room
         socket.emit('query-id');
@@ -203,6 +208,8 @@ window.onload = function () {
         console.log('Id info:', data);
         name = data.name;
         id = data.id;
+        persistentId = data.persistentId;
+        updateUriString(persistentId ? {name: name, room: room, persistentId: persistentId} : {name: name, room: room});
     });
     socket.on('room-info', function(data) {
         var everyoneReady = true;
@@ -231,10 +238,11 @@ window.onload = function () {
         var clientsListStr = "";
         for (i = 0; i < data.clients.length; i++) {
             var client = data.clients[i];
+            console.log(client)
             var readyClassStr = client.data.readyState ? 'ready' : 'not-ready';
             clientsListStr += "<li class='" + readyClassStr + "' x-id='" + client.id + "' x-name='" + client.name + "'>" + client.name + "</li>";
 	    //if everyone ready is still true cueck it against the current players ready state.
-	    if(everyoneReady){
+	    if (everyoneReady) {
 	    	everyoneReady = client.data.readyState; 
 	    }
 	 }
@@ -266,7 +274,7 @@ window.onload = function () {
         }
   
         document.querySelector('.clients-list').innerHTML = clientsListStr;
-	if(everyoneReady){
+	if (everyoneReady) {
 		//define behaviour here, it just forward to another html page now.
 		pageRedirect = gameHtml.concat("?name=" + encodeURI(name) + "&room=" + encodeURI(room));
 		document.location.href= pageRedirect;	

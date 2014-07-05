@@ -36,12 +36,13 @@ app.configure( function() {
 server.listen(PORT);
 console.log('Server listening on port ' + PORT);
 
-
+// global data about the game for a room
+gamesList = {};
 
 // Handle all the websocket connections
 io.sockets.on('connection', function(socket) {
     // initialize the socket object to store some persistent data
-    socket.hanabiData = {};
+    socket.hanabiData = {persistentId: socket.id};
 
     /*
      * Helper Functions
@@ -118,7 +119,10 @@ io.sockets.on('connection', function(socket) {
         socket.emit('room-info', getRoomInfo(room));
     });
     socket.on('query-id', function () {
-        socket.emit('id-info', {name: socket.hanabiData.name, id: socket.id, currentRoom: socket.hanabiData.currentRoom});
+        socket.emit('id-info', {name: socket.hanabiData.name, id: socket.id, currentRoom: socket.hanabiData.currentRoom, persistentId: socket.hanabiData.persistentId});
+    });
+    socket.on('assert-id', function (data) {
+        socket.hanabiData.persistentId = data.persistentId;
     });
 
     // set a new name for the client
