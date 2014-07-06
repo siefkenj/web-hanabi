@@ -155,11 +155,17 @@ function gameMode(name, id, game, socket) {
 		var cardNumber = cardname.substring(0,1)	
 		var cardColor = cardname.substring(2);
 		var s = "";
-		s += "<ul><li class='tellColor' title="+ target.title.substring(5) + ">Tell " + cardColor + "</li>";
-		s += "<li class='tellNumber' title=" + target.title.substring(5) + ">Tell " + cardNumber + "</li>";
-		s += "<li class= 'cancel'>Cancel</li><ul>";
+        if(game.clueTokens == 0){
+            s += "<ul><li class='noClues'>No Clues!</li>";
+        }else{
+            s += "<ul><li class='tellColor' title="+ target.title.substring(5) + ">Tell " + cardColor + "</li>";
+            s += "<li class='tellNumber' title=" + target.title.substring(5) + ">Tell " + cardNumber + "</li>";
+        }
+        s += "<li class= 'cancel'>Cancel</li><ul>";
 		document.querySelector('#instruction').innerHTML = s;
-		document.querySelector('.tellColor').style.background = cardColor;
+        if(document.querySelector('.tellColor')){
+            document.querySelector('.tellColor').style.background = cardColor;
+        }
 		addInstructionListner();
 	}
 
@@ -262,7 +268,9 @@ function gameMode(name, id, game, socket) {
 			document.querySelector('.discardCard').addEventListener('click', Discard);
 		if (document.querySelector('.playCard'))
 			document.querySelector('.playCard').addEventListener('click', play);
-		if (document.querySelector('.cancel'))
+		if (document.querySelector('.noClues'))
+			document.querySelector('.noClues').addEventListener('click', clearInstructions);
+        if (document.querySelector('.cancel'))
 			document.querySelector('.cancel').addEventListener('click', clearInstructions);
 	}
 
@@ -445,7 +453,3 @@ function gameMode(name, id, game, socket) {
 	window.gameObject = game;
 
 }
-
-
-
-

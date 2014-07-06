@@ -1,8 +1,7 @@
 "use strict";
 
 //used for testing everyone ready behaviour.
-var gameHtml = "/tests/game_screen_play.html";
-var pageRedirect = gameHtml;
+var pageRedirect = "/tests/ready.html";
 
 function parseUriSearchString (str) {
     // Remove leading questionmark
@@ -61,7 +60,7 @@ function makeElementEditable(elm, callback){
 
     function changeTextValue(val) {
         textElm.setAttribute('style', '');
-        textbox.setAttribute('style', 'display: none');
+        textbox.setAttribute('style', 'display: e');
         textbox.classList.remove('editing');
         if (val.length > 0) {
             textElm.textContent = val;
@@ -212,7 +211,6 @@ window.onload = function () {
         updateUriString(persistentId ? {name: name, room: room, persistentId: persistentId} : {name: name, room: room});
     });
     socket.on('room-info', function(data) {
-        var everyoneReady = true;
         var i, j;
         console.log('Room info:', data);
 
@@ -241,10 +239,6 @@ window.onload = function () {
             console.log(client)
             var readyClassStr = client.data.readyState ? 'ready' : 'not-ready';
             clientsListStr += "<li class='" + readyClassStr + "' x-id='" + client.id + "' x-name='" + client.name + "'>" + client.name + "</li>";
-	    //if everyone ready is still true cueck it against the current players ready state.
-	    if (everyoneReady) {
-	    	everyoneReady = client.data.readyState; 
-	    }
 	 }
 
 	 var readyButtonText = document.querySelector('#ready-button .text');
@@ -274,10 +268,11 @@ window.onload = function () {
         }
   
         document.querySelector('.clients-list').innerHTML = clientsListStr;
-	if (everyoneReady) {
-		//define behaviour here, it just forward to another html page now.
-		pageRedirect = gameHtml.concat("?name=" + encodeURI(name) + "&room=" + encodeURI(room));
-		document.location.href= pageRedirect;	
-	}
+    });
+
+    socket.on('new-game', function(game){
+            console.log(game);
+            pageRedirect += window.location.search
+            document.location.href = pageRedirect;
     });
 }

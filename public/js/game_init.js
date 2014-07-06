@@ -1,5 +1,13 @@
 "use strict";
 
+if (typeof exports == "undefined" ) {
+	var exports = {};
+}
+
+function testPrint(){
+	console.log('This is a test of a function');
+}
+
 // shuff a deck
 function shuffle (list) {
     // create an array with array indices and random numbers
@@ -69,3 +77,6 @@ function createDummyGame (numPlayers) {
     var game = createNewGame(numPlayers);
     return game;
 }
+
+exports.createNewGame = createNewGame;
+exports.testPrint = testPrint;

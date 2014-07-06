@@ -26,6 +26,8 @@ var app = express();
 var http = require('http');
 var server = http.createServer(app);
 var io = require('socket.io').listen(server);
+var game_init = require('./public/js/game_init');
+
 
 // Statically server pages from the public directory
 app.configure( function() {
@@ -37,7 +39,7 @@ server.listen(PORT);
 console.log('Server listening on port ' + PORT);
 
 // global data about the game for a room
-gamesList = {};
+var gamesList = {};
 
 // Handle all the websocket connections
 io.sockets.on('connection', function(socket) {
@@ -78,6 +80,16 @@ io.sockets.on('connection', function(socket) {
         }
 
     }
+
+    function isRoomReady(room){
+        for (var i = 0, clients = io.sockets.clients(room); i < clients.length; i++) {
+        if (!clients[i].hanabiData.readyState) {
+            return false;
+        }
+        }
+    return true;
+    }
+    
 
 
     /*
@@ -136,11 +148,18 @@ io.sockets.on('connection', function(socket) {
     socket.on('set-data', function (data) {
         console.log('Setting data', data);
         extend(socket.hanabiData, data);
-        informRoomOfChange(socket.hanabiData.currentRoom);
-    });
-
-    socket.on('game-start', function (data){
-    	console.log('this game is starting with ', data);
+        var room = socket.hanabiData.currentRoom;
+        informRoomOfChange(room);
+        if(isRoomReady(room)){
+            var newGame = game_init.createNewGame( getRoomInfo(room).clients.length);
+            for (var i = 0, clients = io.sockets.clients(room); i < clients.length; i++) {
+                newGame.players[i].id = clients[i].hanabiData.persistentId;
+                newGame.players[i].name = clients[i].hanabiData.name; 
+            }
+            gamesList[room] =  newGame;
+            socket.in(room).broadcast.emit('new-game', newGame);
+            socket.emit('new-game', newGame);
+        }
     });
 
     // when new data is broadcast by a client, emit it to all
