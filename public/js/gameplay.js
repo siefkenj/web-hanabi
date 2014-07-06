@@ -1,5 +1,8 @@
 "use strict"
 
+var lobbyUrl = "/tests/lobby.html";
+var game = null;
+
 function parseUriSearchString (str) {
 	// Remove leading questionmark
 	if (str.charAt(0) == '?') {
@@ -19,133 +22,74 @@ function parseUriSearchString (str) {
 
 
 window.onload = function() {
-	// grab the name and room from the URI search string, or put
-	// in some defaults if they're not given.
+	// grab the name and room from the URI search string
+    // get a few globals
+	// some of these may be redundant
 	var args = parseUriSearchString(window.location.search);
-	var name = args.name || 'Tom';
-	var id = null;
-	var room = args.room || 'innercircle';
-	if (!args.name || !args.room) {
-		window.location.search = "?name=" + encodeURI(name) + "&room=" + encodeURI(room);
+	var name = args.name;
+	var id = args.persistentId;
+	var room = args.room;
+    var myId = id;
+	var others = [];
+    var me = null;
+    var iAmCurrentPlayer = false;
+    
+	//if any of the necessary information is not there, kick them back to the lobby.
+	if(!name||!id||!room){
+	    document.location.href = lobbyUrl;
 	}
+
 	
-	// take a game object game and start the game
-	function startNewGame(game) {
-		console.log('got new game data. starting new game');
-		document.querySelector('#game-screen').setAttribute('style', '')
-		gameMode(name, id, game, socket);
-		
-	}
-
-	console.log(args)
-	var messagesDiv = document.querySelector('#messages');
-
 	// Set up the web socket
 	var socket = io.connect();
 	window.ss = socket;
-	socket.on('connect', function () {
-		console.log('connected');
-		// Set our name
-		socket.emit('set-name', name);
-		// Join the appropriate room as soon as we've connected
-		socket.emit('set-room', room);
-		// Get our ID from the server so we know where we
-		// show up in the list of people in our room
-		socket.emit('query-id');
-	});
-	socket.on('message', function(data) {
-		console.log('Got data', data.message);
-		if (data.message.type == 'new-game') {
-			startNewGame(data.message.game);	
-		}
-	});
-	//lists all the client and room data
-	//the rooms are links to the room in question.
-	//
-	
-	socket.on('room-info', function(data) {
-		var everyoneReady = true;
-		var i;
-		var j;
-		// If we are the first person on the list, we are the leader of the room,
-		// so we should start the game.
-		if (name == data.clients[0].name) {
-			// If there is more than one person in the room and everyone
-			// is ready, then let's start the game.
-			if (data.clients.length > 1 && everyoneReady) {
-				console.log('LEADER: everyone is ready')
-				// We're the leader and everyone is ready, so 
-				// prep the game object and broadcast it to everyone
-				var game = prepGame(data);
-				socket.emit('broadcast', {type: 'new-game', game: game});
-				startNewGame(game);
+   
+    socket.emit("set-name", name);
+    socket.emit("set-room", room); 
+    //go get the game object
+    socket.emit("start-game");
+    
+    socket.on('update-data', function(gameTemp){
+        game = gameTemp;
+        for (var i = 0; i < game.players.length; i++) {
+	    	if (game.players[i].id != myId) {
+                //others is now a list of the index of the player in the array of game.players
+		    	others.push(i);
+		    }
+	    }
+	    me = getPlayerById(game, myId);
+        updateScreen(game);
+    });
 
-			} else {
-				console.log('LEADER: not everyone is ready')
-			}
-		}
-	
-	});
 	socket.on('id-info', function(data) {
-		console.log('Id info:', data);
 		name = data.name;
 		id = data.id;
 	});
-	
 
-	//set ups is the button that sets the room and user data when clicked it runs the change function which sets the information in the URL
-	//The 'setname' and 'roomname' functions are for the ability to press enter in either the set name or set room text inputs
-	document.querySelector('#setUps').addEventListener('click', change);
-	document.querySelector('#setName').addEventListener('keydown', enterData);
-	document.querySelector('#roomName').addEventListener('keydown', enterData);
 
-};
-// prepare a game object for the players listed in roomInfo
-function prepGame(roomInfo) {
-	var game = createNewGame(roomInfo.clients.length);
-	
-	for (var i = 0; i < roomInfo.clients.length; i++){
-		var player = roomInfo.clients[i];
-		game.players[i].name = player.name;
-		game.players[i].id = player.id;
+    function initializeGame(gameTemp){
+      	for (var i = 0; i < game.players.length; i++) {
+	    	if (game.players[i].id != myId) {
+                //others is now a list of the index of the player in the array of game.players
+		    	others.push(i);
+		    }
+	    }
+	    me = getPlayerById(game, myId);
+        updateScreen(game);
+    }
+
+    function broadcastNewGameState() {
+		socket.emit('game-update', game);
 	}
-
-	return game;
-}
-
-// cheap hack so we can use all the function Andrei already made for us.
-function gameMode(name, id, game, socket) {
-	function broadcastNewGameState() {
-		game.currentPlayer = game.currentPlayer + 1
-		socket.emit('broadcast', {type: 'new-game', game: game});
-	}
-	function getPlayerById(game, id) {
-		for (var i = 0; i < game.players.length; i++) {
+	function getPlayerById(gameTemp, id) {
+		for (var i = 0; i < gameTemp.players.length; i++) {
 			if (game.players[i].id == id) {
 				return game.players[i];
 			}
 		}
 	}
-
-	// moved this from the individual functions it assumes we are the first player we need to make the names the same in order for the 
-		//discard
-		//updateScreen
-	//functions to work, if you make a functions that requires this information make sure to add it here
-
-	var myId = id;
-	var others = []
-	for (var i = 0; i < game.players.length; i++) {
-		if (game.players[i].id != myId) {
-			others.push(game.players[i]);
-		}
-	}
-	var inAction = false;
-	var iAmCurrentPlayer = false;
 	
-	// set up the active players hand
-	var me = getPlayerById(game, myId);
-	
-	/*These are the player actions, clicking on a cars activates either the
+	/*These are the player actions, clicking on a cards activates either the
 	  clue action or the play card action*/
 
 	//if a card in another players hand is clicked then the option to give clues comes up
@@ -158,8 +102,8 @@ function gameMode(name, id, game, socket) {
         if(game.clueTokens == 0){
             s += "<ul><li class='noClues'>No Clues!</li>";
         }else{
-            s += "<ul><li class='tellColor' title="+ target.title.substring(5) + ">Tell " + cardColor + "</li>";
-            s += "<li class='tellNumber' title=" + target.title.substring(5) + ">Tell " + cardNumber + "</li>";
+            s += "<ul><li class='tellColor' title="+ target.title + ">Tell " + cardColor + "</li>";
+            s += "<li class='tellNumber' title=" + target.title + ">Tell " + cardNumber + "</li>";
         }
         s += "<li class= 'cancel'>Cancel</li><ul>";
 		document.querySelector('#instruction').innerHTML = s;
@@ -171,7 +115,7 @@ function gameMode(name, id, game, socket) {
 
 	function setKnowledgeColor(event){
 		var target = event.currentTarget;
-		var player = others[target.title];
+		var player = game.players[target.title];
 		var info = target.innerHTML.substring(5);
 		for (var i = 0; i < player.hand.length;i++){
 			if(player.hand[i].color != info){
@@ -186,14 +130,13 @@ function gameMode(name, id, game, socket) {
 			}
 		}
 		game.clueTokens = Math.max(game.clueTokens - 1, 0);
+       	clearInstructions();
 		broadcastNewGameState();
-		updateScreen(game);
-		clearInstructions();
 	}
 
 	function setKnowledgeNumber(event){
 		var target = event.currentTarget;
-		var player = others[target.title];
+		var player = game.players[target.title];
 		var info = target.innerHTML.substring(5);
 		for (var i = 0; i < player.hand.length;i++){
 			if(player.hand[i].number != info){
@@ -209,7 +152,6 @@ function gameMode(name, id, game, socket) {
 		}
 		game.clueTokens = Math.max(game.clueTokens - 1, 0);
 		broadcastNewGameState();
-		updateScreen(game);
 		clearInstructions();
 	}
 
@@ -242,7 +184,6 @@ function gameMode(name, id, game, socket) {
 		}
 		me.hand.push(game.deck.pop());
 		broadcastNewGameState()
-		updateScreen(game);
 		clearInstructions();
 	}
 
@@ -254,7 +195,6 @@ function gameMode(name, id, game, socket) {
 			me.hand.push(game.deck.pop());
 			game.clueTokens = Math.min(game.clueTokens + 1, game.maxClueTokens)
 			broadcastNewGameState()
-			updateScreen(game);
 			clearInstructions();
 		}
 	}
@@ -357,10 +297,10 @@ function gameMode(name, id, game, socket) {
 
 	// hand is the players hand, parent is the div
 	// that all the cards should be displayed in.
-	function setupHand(hand, parent) {
+	function setupHand(hand, parent, playerNumber) {
 		var s = "<ul>";
 		for (var i = 0; i < hand.length; i++) {
-			s += "<li><img class='card' src='/images/cards/" + hand[i].number + "-" + hand[i].color + ".png' title=" + parent.parentNode.id + " />";
+			s += "<li><img class='card' src='/images/cards/" + hand[i].number + "-" + hand[i].color + ".png' title=" + playerNumber + " />";
 			// put all the information we know about possibilities for the card in one place
 			s += "<div class='knowledge'>";
 			for (var j=0, classList = getKnowledgeClasses(hand[i]); j < classList.length; j++) {
@@ -390,7 +330,7 @@ function gameMode(name, id, game, socket) {
 				var knowledgeClass = classList[j];
 				s += "<div class='" + knowledgeClass +"'></div>"
 			}
-			s += "</div>"
+			s += "</div>";
 			s += "</div>";
 			s += "</li>";
 		}
@@ -401,21 +341,18 @@ function gameMode(name, id, game, socket) {
 	//updates all data on the screen others variable is global and should be defined properly before project is done
 	function updateScreen(game){
 		var currPlayerId = game.players[game.currentPlayer % game.players.length].id;
-		console.log(currPlayerId);
-		console.log('currentPlayer', game.currentPlayer);
 		iAmCurrentPlayer = (currPlayerId == myId);
 		//setup your hand
 		setupMyHand(me.hand, document.querySelector('#myHand .handContents'));
 		// set up the other player's hands
 		for (var i = 0; i < others.length; i++) {
-			var other = others[i];
-
-				document.querySelector('#other' + i + ' .playerName').textContent = other.name;
-			setupHand(other.hand, document.querySelector('#other' + i + ' .handContents'));
+			var other = game.players[others[i]];
+			document.querySelector('#other' + others[i] + ' .playerName').textContent = other.name;
+			setupHand(other.hand, document.querySelector('#other' + others[i] + ' .handContents'), others[i]);
 			if (other.id == currPlayerId) {
-				document.querySelector('#other' + i).setAttribute('style', 'background: orange')
+				document.querySelector('#other' + others[i]).setAttribute('style', 'background: orange')
 			} else {
-				document.querySelector('#other' + i).setAttribute('style', '')
+				document.querySelector('#other' + others[i]).setAttribute('style', '')
 			}
 		}
 		if(currPlayerId == myId){
@@ -446,10 +383,8 @@ function gameMode(name, id, game, socket) {
 		}
 	}
 
-
-
-	updateScreen(game)
 	// for debug perposes, make the game globally accessible
 	window.gameObject = game;
 
 }
+

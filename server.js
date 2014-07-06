@@ -156,6 +156,7 @@ io.sockets.on('connection', function(socket) {
                 newGame.players[i].id = clients[i].hanabiData.persistentId;
                 newGame.players[i].name = clients[i].hanabiData.name; 
             }
+            newGame.room = room;
             gamesList[room] =  newGame;
             socket.in(room).broadcast.emit('new-game', newGame);
             socket.emit('new-game', newGame);
@@ -171,4 +172,25 @@ io.sockets.on('connection', function(socket) {
         // relayed to them
         socket.in(room).broadcast.emit('message', {message: data, senderId: socket.id});
     });
+
+    //sends the game object back on the request to start a new game.
+    socket.on('start-game', function(){
+        var room = socket.hanabiData.currentRoom;
+        console.log("starting game in room", room);
+        socket.emit('update-data', gamesList[room]);
+    });
+
+    socket.on('game-update', function(game){
+       var room = socket.hanabiData.currentRoom;
+       game.currentPlayer = game.currentPlayer + 1;
+       gamesList[room] = game;
+       console.log(gamesList[room]);
+	   socket.in(room).broadcast.emit('update-data', gamesList[room]);
+       
+       socket.emit('update-data', gamesList[room]);      
+    });
+	    
 });
+
+	
+
