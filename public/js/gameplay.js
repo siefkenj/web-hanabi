@@ -51,13 +51,13 @@ window.onload = function() {
     
     socket.on('update-data', function(gameTemp){
         game = gameTemp;
+	me = getPlayerById(game, myId);
         for (var i = 0; i < game.players.length; i++) {
 	    	if (game.players[i].id != myId) {
                 //others is now a list of the index of the player in the array of game.players
 		    	others.push(i);
 		    }
 	    }
-	    me = getPlayerById(game, myId);
         updateScreen(game);
     });
 
