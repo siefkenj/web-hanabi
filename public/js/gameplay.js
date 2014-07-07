@@ -29,9 +29,9 @@ window.onload = function() {
 	var name = args.name;
 	var id = args.persistentId;
 	var room = args.room;
-    var myId = id;
+    	var myId = id;
 	var others = [];
-    var me = null;
+    	var me = null;
     var iAmCurrentPlayer = false;
     
 	//if any of the necessary information is not there, kick them back to the lobby.
@@ -366,6 +366,8 @@ window.onload = function() {
 		// display the clue tokens
 		document.querySelector('.cluesDisplay').innerHTML = game.clueTokens;
 		// display the discard hand
+		console.log(document.querySelector('.deckDisplay').innerHTML);
+		document.querySelector('.deckDisplay').innerHTML = game.deck.length;
 		setupCards(game.discard,  document.querySelector('#discard'));
 		setupCards(game.tableau,  document.querySelector('#tableau'));
 		//could put some sort of toggle here to make these only happen if it is your turn.
