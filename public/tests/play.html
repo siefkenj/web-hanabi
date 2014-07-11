@@ -1,0 +1,320 @@
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Play Screen</title>
+    <style>
+        html {
+            height: 100%;
+        }
+        body {
+            height: 100%;
+            margin: 0px;
+            padding: 0px;
+            flex-flow: column nowrap;
+            display: flex;
+            font-family: sans-serif;
+        }
+        body div {
+            flex: 1 1 auto;
+        }
+        #header {
+            flex: 0 1 auto;
+        }
+        #footer {
+            flex: 0 1 auto;
+        }
+        * {
+            /*border: 1px solid red;*/
+        }
+        #hand12 {
+            flex: 0 1 auto;
+        }
+        #hand12 ul {
+            display: flex;
+            flex-flow: row nowrap;
+            list-style: none;
+            padding: 0px;
+            margin: 0px;
+        }
+        #game-area {
+            flex: 1 1 auto;
+            display: flex;
+            flex-flow: column nowrap;
+        }
+        #hand345 {
+            flex: 0 1 auto;
+        }
+        #hand345 ul {
+            display: flex;
+            flex-flow: row nowrap;
+            list-style: none;
+            padding: 0px;
+            margin: 0px;
+        }
+        .hand {
+            flex: 1 1 auto;
+            background: grey;
+            border-style: solid;
+   			border-width: 1px;
+        }
+        .myhand {
+            flex: 3 1 auto;
+            background: green;
+        }
+        #livesAndClues {
+            display: flex;
+            flex-flow: column nowrap;
+            flex: 0 1 auto;
+   			align-items: center;
+   			justify-content: center;
+        }
+        #tableau {
+            display: flex;
+            flex-flow: row nowrap;
+            flex: 3 1 auto;
+        }
+        #deck {
+        	width: 100px;
+            height: 100px;
+            background-size: 100% 100%;
+			background-image: url('../images/deck.png');
+			flex: 1 1 auto;	
+		}
+        #play-field {
+            flex: 3 1 auto;
+            border-style: solid;
+   			border-width: 1px;
+        }
+        #discard {
+            flex: 4 1 auto;
+        }
+        .card {
+            width: 73px;
+            height: 110px;
+            background: white;
+            margin:2px;
+            border-radius: 10px;
+			border: 1px solid #555;
+			transition: box-shadow .2s;
+        }
+        .card:hover{
+			box-shadow: 0px 0px 15px yellow;
+        }
+        .card.selected {
+				box-shadow: 0px 0px 5px #00f;
+		}
+		.card.selected:hover {
+				box-shadow: 0px 0px 10px #00f;
+		}
+        
+        #lives {
+            background-image: url('../images/heart.svg');
+            width: 100px;
+            height: 100px;
+            background-size: 100% 100%;
+            flex: 1 1 auto;
+        }
+        #lives .heartsDisplay {
+            color: white;
+            font-size: 30px;
+            padding-top: 40%;
+            text-align: center;
+            font-weight: bold;
+            font-family: sans-serif;
+            text-shadow: 0px 0px 4px blue;
+        }
+        #clues {
+            background-image: url('../images/clues.png');
+            width: 100px;
+            height: 100px;
+			background-size: 100% 100%;
+            flex: 1 1 auto;
+        }
+        #clues .clueDisplay {
+            color: white;
+            font-size: 30px;
+            padding-top: 30%;
+            text-align: center;
+            font-weight: bold;
+            font-family: sans-serif;
+            text-shadow: 0px 0px 4px #00FF21;
+        }
+        
+        .playerName {
+        	margin: 0px;
+        }
+        
+        .handContents { 
+        	width: 100%; 
+        	overflow: hidden; 
+        }
+		.handContents ul { 
+			list-style: none; 
+			position: relative; 
+			float: left; 
+			display: block; 
+			left: 50%; 
+		}
+		.handContents ul li { 
+			position: relative; 
+			float: left; 
+			display: block; 
+			right: 50%; 
+		}
+		#header {
+			background: black;
+			flex: 0 1 auto;
+			text-align: center;
+			margin: 0px;
+			text-shadow: 0 0 5px white;
+			color: black;
+			font-family: sans-serif;
+			font-weight: bold;
+			font-size: 30px;
+		}
+		
+    </style>
+</head>
+
+<body>
+    <div id="game-area">
+        <div id="hand12">
+            <ul>
+                <li class="hand">
+                        <h4 class="playerName">Tom</h4>
+                        <div class="handContents">
+                            <ul>
+                                <li>
+                                    <img class="card" src="/images/cards/3-blue.png">
+                                </li>
+                                <li>
+                                    <img class="card" src="/images/cards/2-green.png">
+                                </li>
+                                <li>
+                                    <img class="card" src="/images/cards/3-blue.png">
+                                </li>
+                                <li>
+                                    <img class="card" src="/images/cards/2-green.png">
+                                </li>
+                                <li>
+                                    <img class="card" src="/images/cards/3-black.png">
+                                </li>
+                            </ul>
+                        </div>
+                </li>
+                <li class="hand">
+                        <h4 class="playerName">Tom</h4>
+                        <div class="handContents">
+                            <ul>
+                                <li>
+                                    <img class="card" src="/images/cards/3-blue.png">
+                                </li>
+                                <li>
+                                    <img class="card" src="/images/cards/2-green.png">
+                                </li>
+                                <li>
+                                    <img class="card" src="/images/cards/3-black.png">
+                                </li>
+                                <li>
+                                    <img class="card" src="/images/cards/1-yellow.png">
+                                </li>
+                                <li>
+                                    <img class="card" src="/images/cards/5-red.png">
+                                </li>
+                            </ul>
+                        </div>
+                </li>
+            </ul>
+            </div>
+            <div id="tableau">
+                <div id="livesAndClues">
+                    <div id="clues">
+                        <div class="clueDisplay">8</div>
+                    </div>
+                    <div id="lives">
+                        <div class="heartsDisplay">3</div>
+                    </div>
+                    <div id="deck">
+                		<div class="deckDisplay"></div>
+                	</div>
+                </div>
+                <div id="play-field">playField</div>
+                <div id="discard">discard</div>
+            </div>
+            <div id="hand345">
+                <ul>
+                    <li class="hand">
+                            <h4 class="playerName">Tom</h4>
+                            <div class="handContents">
+                                <ul>
+                                    <li>
+                                        <img class="card" src="/images/cards/4-blue.png">
+                                    </li>
+                                    <li>
+                                        <img class="card" src="/images/cards/5-black.png">
+                                    </li>
+                                    <li>
+                                        <img class="card" src="/images/cards/5-blue.png">
+                                    </li>
+                                    <li>
+                                        <img class="card" src="/images/cards/5-green.png">
+                                    </li>
+                                    <li>
+                                        <img class="card" src="/images/cards/4-red.png">
+                                    </li>
+                                </ul>
+                            </div>
+                    </li>
+                    <li class="myhand">
+                            <h4 class="playerName">Tom</h4>
+                            <div class="handContents">
+                                <ul>
+                                    <li>
+                                        <img class="card" src="/images/cards/3-blue.png">
+                                    </li>
+                                    <li>
+                                        <img class="card" src="/images/cards/2-green.png">
+                                    </li>
+                                    <li>
+                                        <img class="card" src="/images/cards/3-black.png">
+                                    </li>
+                                    <li>
+                                        <img class="card" src="/images/cards/1-yellow.png">
+                                    </li>
+                                    <li>
+                                        <img class="card" src="/images/cards/5-red.png">
+                                    </li>
+                                </ul>
+                            </div>
+                    </li>
+                    <li class="hand">
+                            <h4 class="playerName">Tom</h4>
+                            <div class="handContents">
+                                <ul>
+                                    <li>
+                                        <img class="card" src="/images/cards/3-blue.png">
+                                    </li>
+                                    <li>
+                                        <img class="card" src="/images/cards/2-green.png">
+                                    </li>
+                                    <li>
+                                        <img class="card" src="/images/cards/3-black.png">
+                                    </li>
+                                    <li>
+                                        <img class="card" src="/images/cards/1-yellow.png">
+                                    </li>
+                                    <li>
+                                        <img class="card" src="/images/cards/5-red.png">
+                                    </li>
+                                </ul>
+                            </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    <div id="footer"></div>
+</body>
+
+</html>
