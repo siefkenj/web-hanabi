@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Play Screen</title>
+    <style>
+    	html {
+            height: 100%;
+        }
+        body {
+            height: 100%;
+            margin: 0px;
+            padding: 0px;
+            display: flex;
+            flex-flow: column nowrap;
+            display: flex;
+            font-family: sans-serif;
+        }
+         * {
+            border: 1px solid red;
+        }
+        #hand12 {
+        	display: flex;
+            flex-flow: row nowrap;
+            padding: 0px;
+            margin:0px;
+            flex: 0 1 auto;
+        }
+        .card {
+			width: 73px;
+			height: 110px;
+			background: white;
+			margin:2px;
+			border-radius: 10px;
+			border: 1px solid #555;
+			transition: box-shadow .2s;
+		}
+        .card:hover{
+			box-shadow: 0px 0px 15px yellow;
+        }
+        #tableau{
+        	display: flex;
+        	flex-flow: row nowrap;
+        	width: 100%;
+        	flex: 5 1 auto;
+        }
+        #clues-hearts-deck{
+        	flex: 1 1 auto;
+        }
+        #play-field{
+        	flex: 7 1 auto;
+        }
+        #discard{
+        	flex: 7 1 auto;
+        }
+        #hand345 {
+        	display: flex;
+            flex-flow: row nowrap;
+            padding: 0px;
+            margin:0px;
+            flex: 0 1 auto;
+            margin:0px;
+        }
+        .hand{
+        	margin:auto;
+        }
+        #clues-hearts-deck{
+			display: flex;
+			flex-flow: column nowrap;
+			justify-content: space-around;
+			flex: 0 1 auto;
+        }
+        #clueDisplay {
+			background-image: url('../images/clues.png');
+			width: 100px;
+			height: 100px;
+			background-size: 100% 100%;
+			margin: auto;
+        }	
+        #heartsDisplay {
+            background-image: url('../images/heart.svg');
+            width: 100px;
+            height: 100px;
+            background-size: 100% 100%;
+            margin:auto;
+        }
+        #deckDisplay {
+			width: 100px;
+			height: 100px;
+			background-size: 100% 100%;
+			background-image: url('../images/deck.png');
+			margin:auto;
+		}
+        
+        
+        
+    </style>
+</head>
+
+<body>
+    <div id="game-area">
+        <div id="hand12" class="hand-contents">
+        	<div id="hand1" class="hand">
+        		<img class="card" src="/images/cards/3-blue.png">
+               	<img class="card" src="/images/cards/2-green.png">
+           	    <img class="card" src="/images/cards/3-blue.png">
+				<img class="card" src="/images/cards/2-green.png">
+      	      	<img class="card" src="/images/cards/3-black.png">
+          	  </div>
+        	<div id="hand2" class="hand">
+    			<img class="card" src="/images/cards/3-blue.png">
+         	  	<img class="card" src="/images/cards/2-green.png">
+           		<img class="card" src="/images/cards/3-blue.png">
+				<img class="card" src="/images/cards/2-green.png">
+              	<img class="card" src="/images/cards/3-black.png">
+            </div>		
+        </div>
+    </div>
+    <div id="tableau">
+    	<div id="clues-hearts-deck">
+  	          <div id="clueDisplay">8</div>
+    		  <div id="heartsDisplay">3</div>
+              <div id="deckDisplay"></div>
+        </div>
+            <div id="play-field">playField</div>
+            <div id="discard">discard</div>
+    </div>
+     <div id="hand345" class="hand-contents">
+        	<div id="hand3" class="hand">
+        		<img class="card" src="/images/cards/3-blue.png">
+               	<img class="card" src="/images/cards/2-green.png">
+           	    <img class="card" src="/images/cards/3-blue.png">
+				<img class="card" src="/images/cards/2-green.png">
+      	      	<img class="card" src="/images/cards/3-black.png">
+          	 </div>
+        	<div id="hand4" class="hand">
+    			<img class="card" src="/images/cards/3-blue.png">
+         	  	<img class="card" src="/images/cards/2-green.png">
+           		<img class="card" src="/images/cards/3-blue.png">
+				<img class="card" src="/images/cards/2-green.png">
+              	<img class="card" src="/images/cards/3-black.png">
+            </div>
+            <div id="hand5" class="hand">
+    			<img class="card" src="/images/cards/3-blue.png">
+         	  	<img class="card" src="/images/cards/2-green.png">
+           		<img class="card" src="/images/cards/3-blue.png">
+				<img class="card" src="/images/cards/2-green.png">
+              	<img class="card" src="/images/cards/3-black.png">
+            </div>		
+    </div>
+    			
+    			
+    			
+    			
+    			
+    			
+    			
+    			
+    	
