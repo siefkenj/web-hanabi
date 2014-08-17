@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<script src="/js/socket.io.js"></script>
+	<script src="/js/game_init.js"></script>
+	<script src="/js/gameplay2.js"></script>
+
+	<title>Play Screen</title>
+    <style>
+    	html {
+            height: 100%;
+        }
+        body {
+            height: 100%;
+            margin: 0px;
+            padding: 0px;
+            display: flex;
+            flex-flow: column nowrap;
+            display: flex;
+            font-family: sans-serif;
+        }
+        /* * {
+            border: 1px solid red;
+        }*/
+        #hand12 {
+        	display: flex;
+            flex-flow: row nowrap;
+            padding: 0px;
+            margin:0px;
+            flex: 0 1 auto;
+        }
+        .card {
+			width: 73px;
+			height: 110px;
+			background: white;
+			margin:2px;
+			border-radius: 10px;
+			border: 1px solid #555;
+			transition: box-shadow .2s;
+		}
+        .card:hover{
+			box-shadow: 0px 0px 15px yellow;
+        }
+        #tableau{
+        	display: flex;
+        	flex-flow: row nowrap;
+        	width: 100%;
+        	flex: 5 1 auto;
+        }
+        #clues-hearts-deck{
+        	flex: 1 1 auto;
+        }
+        #play-field{
+        	flex: 7 1 auto;
+        }
+        #discard{
+        	flex: 7 1 auto;
+        }
+        #hand345 {
+        	display: flex;
+            flex-flow: row nowrap;
+            padding: 0px;
+            margin:0px;
+            flex: 0 1 auto;
+            margin:0px;
+        }
+        .hand{
+        	margin:auto;
+        }
+        #clues-hearts-deck{
+			display: flex;
+			flex-flow: column nowrap;
+			justify-content: space-around;
+			flex: 0 1 auto;
+        }
+        #clue-display {
+			background-image: url('../images/clues.png');
+			width: 100px;
+			height: 100px;
+			background-size: 100% 100%;
+			margin: auto;
+        }	
+        #hearts-display {
+            background-image: url('../images/heart.svg');
+            width: 100px;
+            height: 100px;
+            background-size: 100% 100%;
+            margin:auto;
+        }
+        #deck-display {
+			width: 100px;
+			height: 100px;
+			background-size: 100% 100%;
+			background-image: url('../images/deck.png');
+			margin:auto;
+		}
+		.hand-contents ul{
+			list-style:none;
+			margin: 0px;
+			padding: 0px;
+		}
+		.hand-contents li{
+			display: inline-block;
+		}	
+       li:first-child .knowledge:before {
+		content: 'Could be:';
+		font-size: .7em;
+		position: absolute;
+		font-style: italic;
+		top: -1em;
+		}
+
+	.knowledge {
+		width: 5em;
+		height: 2.2em;
+		display: block;
+		position: relative;
+	}
+	.knowledge .color, .knowledge .number {
+		display: none;
+	}
+	.maybe-red .color:nth-child(1) {
+		position: absolute;
+		color: red;
+		left: 0em;
+		bottom: 0em;
+		display: block;
+	}
+	.maybe-green .color:nth-child(2) {
+		position: absolute;
+		color: green;
+		left: 1em;
+		bottom: 0em;
+		display: block;
+	}
+	.maybe-yellow .color:nth-child(3) {
+		position: absolute;
+		color: yellow;
+		left: 2em;
+		bottom: 0em;
+		display: block;
+	}
+	.maybe-blue .color:nth-child(4) {
+		position: absolute;
+		color: blue;
+		left: 3em;
+		bottom: 0em;
+		display: block;
+	}
+	.maybe-black .color:nth-child(5) {
+		position: absolute;
+		color: black;
+		left: 4em;
+		bottom: 0em;
+		display: block;
+	}
+	.maybe-1 .number:nth-child(6) {
+		position: absolute;
+		number: red;
+		left: 0em;
+		bottom: 1em;
+		display: block;
+	}
+	.maybe-2 .number:nth-child(7) {
+		position: absolute;
+		number: green;
+		left: 1em;
+		bottom: 1em;
+		display: block;
+	}
+	.maybe-3 .number:nth-child(8) {
+		position: absolute;
+		number: yellow;
+		left: 2em;
+		bottom: 1em;
+		display: block;
+	}
+	.maybe-4 .number:nth-child(9) {
+		position: absolute;
+		number: blue;
+		left: 3em;
+		bottom: 1em;
+		display: block;
+	}
+	.maybe-5 .number:nth-child(10) {
+		position: absolute;
+		number: black;
+		left: 4em;
+		bottom: 1em;
+		display: block;
+	} 
+	.instruction {
+		position: absolute;
+		bottom: 0px;
+		width: 100%;
+		height: 50%;
+		background: blue;
+	}
+	.instruction li{
+		width: 31%;
+		padding: 0px;
+		margin:0px;
+		height: 100%;
+	}	
+	.hand {
+		position: relative;
+	}
+    </style>
+</head>
+
+<body>
+    <div id="game-area">
+        <div id="hand12" class="hand-contents">
+        	<div id="hand0" class="hand">
+				<ul class="card-list">	
+        		<img class="card" src="/images/cards/3-blue.png">
+               	<img class="card" src="/images/cards/2-green.png">
+           	    <img class="card" src="/images/cards/3-blue.png">
+				<img class="card" src="/images/cards/2-green.png">
+      	      	<img class="card" src="/images/cards/3-black.png">
+				<ul>
+          	  </div>
+        	<div id="hand1" class="hand">
+			
+					<ul class="card-list">
+				<li>
+    				<div class="knowledge maybe-four maybe-green maybe-blue  maybe-two maybe-yellow maybe-black">
+					<span class="color">■</span><span class="color">■</span><span class="color">■</span><span class="color">■</span><span class="color">■</span>
+					<span class="number">1</span><span class="number">2</span><span class="number">3</span><span class="number">4</span><span class="number">5</span>
+					</div>
+					<img class="card" src="/images/cards/3-blue.png">
+				</li>
+				<li>
+					<div class="knowledge maybe-red maybe-green maybe-blue  maybe-two maybe-yellow maybe-black">
+						<span class="color">■</span><span class="color">■</span><span class="color">■</span><span class="color">■</span><span class="color">■</span>
+						<span class="number">1</span><span class="number">2</span><span class="number">3</span><span class="number">4</span><span class="number">5</span>
+					</div>
+         	  		<img class="card" src="/images/cards/2-green.png">
+				</li>
+				<li>
+           			<img class="card" src="/images/cards/3-blue.png">
+				</li>
+				<li>
+					<img class="card" src="/images/cards/2-green.png">
+				</li>
+				<li>
+              		<img class="card" src="/images/cards/3-black.png">
+				</li>
+				</ul>
+        	</div>		
+        </div>
+    </div>
+    <div id="tableau">
+    	<div id="clues-hearts-deck">
+  	          <div id="clue-display">8</div>
+    		  <div id="hearts-display">3</div>
+              <div id="deck-display"></div>
+        </div>
+            <div id="play-field">playField</div>
+            <div id="discard">discard</div>
+    </div>
+     <div id="hand345" class="hand-contents">
+        	<div id="hand2" class="hand">
+				<ul class="card-list">	
+        		<img class="card" >
+				<img class="card" src="/images/cards/2-green.png">
+				<img class="card" src="/images/cards/3-blue.png">
+				<img class="card" src="/images/cards/2-green.png">
+      	      	<img class="card" src="/images/cards/3-black.png">
+				</ul>
+          	 </div>
+        	<div id="my-hand" class="hand">
+				<ul class="instruction">
+					<li x-button='tell-color' >Tell Color</li>
+					<li x-button='tell-number'>Tell Number</li>
+        			<li x-button='cancel'>Cancel</li>
+				</ul>
+				<ul class="card-list">	
+						<li>
+							<img class="card" src="/images/cards/3-blue.png">
+						</li>
+						<li>				
+							<img class="card" src="/images/cards/2-green.png">
+						</li>
+						<img class="card" src="/images/cards/3-blue.png">
+						<li>				
+							<img class="card" src="/images/cards/2-green.png">
+						</li>
+						<li>	
+						<img class="card" src="/images/cards/3-black.png">
+						</li>
+				</ul>
+			</div>
+            <div id="hand3" class="hand">
+				<ul class="card-list">	
+    			<img class="card" src="/images/cards/3-blue.png">
+         	  	<img class="card" src="/images/cards/2-green.png">
+           		<img class="card" src="/images/cards/3-blue.png">
+				<img class="card" src="/images/cards/2-green.png">
+              	<img class="card" src="/images/cards/3-black.png">
+				</ul>
+            </div>		
+    </div>
+    			
+    			
+    			
+    			
+    			
+    			
+    			
+    			
+    	
