@@ -17,7 +17,7 @@
             font-family: sans-serif;
         }
          * {
-            border: 1px solid red;
+           /* border: 1px solid red;*/
         }
         #hand12 {
         	display: flex;
@@ -26,6 +26,16 @@
             margin:0px;
             flex: 0 1 auto;
         }
+        
+        /*this is making the cards show up in row*/
+        #hand12 ul {
+            display: flex;
+            flex-flow: row nowrap;
+            list-style: none;
+            padding: 0px;
+            margin:0px;
+            }
+            
         .card {
 			width: 73px;
 			height: 110px;
@@ -61,8 +71,23 @@
             flex: 0 1 auto;
             margin:0px;
         }
+        
+         #hand345 ul {
+            display: flex;
+            flex-flow: row nowrap;
+            list-style: none;
+            padding: 0px;
+            margin:0px;
+            }
+            
         .hand{
         	margin:auto;
+        }
+        ul {
+        	list-style: none;
+        }
+        ul li{
+        	display: inline;
         }
         #clues-hearts-deck{
 			display: flex;
@@ -77,12 +102,30 @@
 			background-size: 100% 100%;
 			margin: auto;
         }	
+        #clue-text {
+            color: white;
+            font-size: 30px;
+            padding-top: 30%;
+            text-align: center;
+            font-weight: bold;
+            font-family: sans-serif;
+            text-shadow: 0px 0px 4px #00FF21;
+        }
         #heartsDisplay {
             background-image: url('../images/heart.svg');
             width: 100px;
             height: 100px;
             background-size: 100% 100%;
             margin:auto;
+        }
+        #heart-text {
+        	color: white;
+            font-size: 30px;
+            padding-top: 30%;
+            text-align: center;
+            font-weight: bold;
+            font-family: sans-serif;
+            text-shadow: 0px 0px 4px blue;
         }
         #deckDisplay {
 			width: 100px;
@@ -91,8 +134,103 @@
 			background-image: url('../images/deck.png');
 			margin:auto;
 		}
+		#deck-text {
+		 	color: white;
+            font-size: 30px;
+            padding-top: 30%;
+            text-align: center;
+            font-weight: bold;
+            font-family: sans-serif;
+            text-shadow: 0px 0px 4px blue;
+		}        
         
-        
+        	li:first-child .knowledge:before {
+		content: 'Could be:';
+		font-size: .7em;
+		position: absolute;
+		font-style: italic;
+		top: -1em;
+
+	}
+	.knowledge {
+		width: 5em;
+		height: 2.2em;
+		display: block;
+		position: relative;
+	}
+	.knowledge .color, .knowledge .number {
+		display: none;
+	}
+	.maybe-red .color:nth-child(1) {
+		position: absolute;
+		color: red;
+		left: 0em;
+		bottom: 0em;
+		display: block;
+	}
+	.maybe-green .color:nth-child(2) {
+		position: absolute;
+		color: green;
+		left: 1em;
+		bottom: 0em;
+		display: block;
+	}
+	.maybe-yellow .color:nth-child(3) {
+		position: absolute;
+		color: yellow;
+		left: 2em;
+		bottom: 0em;
+		display: block;
+	}
+	.maybe-blue .color:nth-child(4) {
+		position: absolute;
+		color: blue;
+		left: 3em;
+		bottom: 0em;
+		display: block;
+	}
+	.maybe-black .color:nth-child(5) {
+		position: absolute;
+		color: black;
+		left: 4em;
+		bottom: 0em;
+		display: block;
+	}
+	.maybe-one .number:nth-child(6) {
+		position: absolute;
+		number: red;
+		left: 0em;
+		bottom: 1em;
+		display: block;
+	}
+	.maybe-two .number:nth-child(7) {
+		position: absolute;
+		number: green;
+		left: 1em;
+		bottom: 1em;
+		display: block;
+	}
+	.maybe-three .number:nth-child(8) {
+		position: absolute;
+		number: yellow;
+		left: 2em;
+		bottom: 1em;
+		display: block;
+	}
+	.maybe-four .number:nth-child(9) {
+		position: absolute;
+		number: blue;
+		left: 3em;
+		bottom: 1em;
+		display: block;
+	}
+	.maybe-five .number:nth-child(10) {
+		position: absolute;
+		number: black;
+		left: 4em;
+		bottom: 1em;
+		display: block;
+	}
         
     </style>
 </head>
@@ -101,51 +239,186 @@
     <div id="game-area">
         <div id="hand12" class="hand-contents">
         	<div id="hand1" class="hand">
-        		<img class="card" src="/images/cards/3-blue.png">
-               	<img class="card" src="/images/cards/2-green.png">
-           	    <img class="card" src="/images/cards/3-blue.png">
-				<img class="card" src="/images/cards/2-green.png">
-      	      	<img class="card" src="/images/cards/3-black.png">
+        	<ul>
+        		<li>
+        		<div class="knowledge maybe-red maybe-green maybe-blue  maybe-two maybe-yellow maybe-black">
+						<span class="color">■</span><span class="color">■</span><span class="color">■</span><span class="color">■</span><span class="color">■</span>
+						<span class="number">1</span><span class="number">2</span><span class="number">3</span><span class="number">4</span><span class="number">5</span>
+					</div>
+					<img class="card" src="/images/cards/3-blue.png"></li>
+               	<li>
+               	<div class="knowledge maybe-red maybe-green maybe-blue  maybe-two maybe-yellow maybe-black">
+						<span class="color">■</span><span class="color">■</span><span class="color">■</span><span class="color">■</span><span class="color">■</span>
+						<span class="number">1</span><span class="number">2</span><span class="number">3</span><span class="number">4</span><span class="number">5</span>
+					</div>
+					<img class="card" src="/images/cards/2-green.png"></li>
+           	    <li>
+           	    <div class="knowledge maybe-red maybe-green maybe-blue  maybe-two maybe-yellow maybe-black">
+						<span class="color">■</span><span class="color">■</span><span class="color">■</span><span class="color">■</span><span class="color">■</span>
+						<span class="number">1</span><span class="number">2</span><span class="number">3</span><span class="number">4</span><span class="number">5</span>
+					</div>
+					<img class="card" src="/images/cards/3-blue.png"></li>
+				<li>
+				<div class="knowledge maybe-red maybe-green maybe-blue  maybe-two maybe-yellow maybe-black">
+						<span class="color">■</span><span class="color">■</span><span class="color">■</span><span class="color">■</span><span class="color">■</span>
+						<span class="number">1</span><span class="number">2</span><span class="number">3</span><span class="number">4</span><span class="number">5</span>
+					</div>
+					<img class="card" src="/images/cards/2-green.png"></li>
+      	      	<li>
+      	      	<div class="knowledge maybe-red maybe-green maybe-blue  maybe-two maybe-yellow maybe-black">
+						<span class="color">■</span><span class="color">■</span><span class="color">■</span><span class="color">■</span><span class="color">■</span>
+						<span class="number">1</span><span class="number">2</span><span class="number">3</span><span class="number">4</span><span class="number">5</span>
+					</div>
+					<img class="card" src="/images/cards/3-black.png"></li>
+      	  	</ul>
           	  </div>
         	<div id="hand2" class="hand">
-    			<img class="card" src="/images/cards/3-blue.png">
-         	  	<img class="card" src="/images/cards/2-green.png">
-           		<img class="card" src="/images/cards/3-blue.png">
-				<img class="card" src="/images/cards/2-green.png">
-              	<img class="card" src="/images/cards/3-black.png">
+    		<ul>
+        		<li>
+        		<div class="knowledge maybe-red maybe-green maybe-blue  maybe-two maybe-yellow maybe-black">
+						<span class="color">■</span><span class="color">■</span><span class="color">■</span><span class="color">■</span><span class="color">■</span>
+						<span class="number">1</span><span class="number">2</span><span class="number">3</span><span class="number">4</span><span class="number">5</span>
+					</div>
+					<img class="card" src="/images/cards/3-blue.png"></li>
+               	<li>
+               	<div class="knowledge maybe-red maybe-green maybe-blue  maybe-two maybe-yellow maybe-black">
+						<span class="color">■</span><span class="color">■</span><span class="color">■</span><span class="color">■</span><span class="color">■</span>
+						<span class="number">1</span><span class="number">2</span><span class="number">3</span><span class="number">4</span><span class="number">5</span>
+					</div>
+					<img class="card" src="/images/cards/2-green.png"></li>
+           	    <li>
+           	    <div class="knowledge maybe-red maybe-green maybe-blue  maybe-two maybe-yellow maybe-black">
+						<span class="color">■</span><span class="color">■</span><span class="color">■</span><span class="color">■</span><span class="color">■</span>
+						<span class="number">1</span><span class="number">2</span><span class="number">3</span><span class="number">4</span><span class="number">5</span>
+					</div>
+					<img class="card" src="/images/cards/3-blue.png"></li>
+				<li>
+				<div class="knowledge maybe-red maybe-green maybe-blue  maybe-two maybe-yellow maybe-black">
+						<span class="color">■</span><span class="color">■</span><span class="color">■</span><span class="color">■</span><span class="color">■</span>
+						<span class="number">1</span><span class="number">2</span><span class="number">3</span><span class="number">4</span><span class="number">5</span>
+					</div>
+					<img class="card" src="/images/cards/2-green.png"></li>
+      	      	<li>
+      	      	<div class="knowledge maybe-red maybe-green maybe-blue  maybe-two maybe-yellow maybe-black">
+						<span class="color">■</span><span class="color">■</span><span class="color">■</span><span class="color">■</span><span class="color">■</span>
+						<span class="number">1</span><span class="number">2</span><span class="number">3</span><span class="number">4</span><span class="number">5</span>
+					</div>
+					<img class="card" src="/images/cards/3-black.png"></li>
+      	  	</ul>
             </div>		
         </div>
     </div>
     <div id="tableau">
     	<div id="clues-hearts-deck">
-  	          <div id="clueDisplay">8</div>
-    		  <div id="heartsDisplay">3</div>
-              <div id="deckDisplay"></div>
+  	          <div id="clueDisplay"><div id="clue-text">8</div></div>
+    		  <div id="heartsDisplay"><div id="heart-text">3</div></div>
+              <div id="deckDisplay"><div id="deck-text">#</div></div>
         </div>
             <div id="play-field">playField</div>
             <div id="discard">discard</div>
     </div>
      <div id="hand345" class="hand-contents">
         	<div id="hand3" class="hand">
-        		<img class="card" src="/images/cards/3-blue.png">
-               	<img class="card" src="/images/cards/2-green.png">
-           	    <img class="card" src="/images/cards/3-blue.png">
-				<img class="card" src="/images/cards/2-green.png">
-      	      	<img class="card" src="/images/cards/3-black.png">
+        	<ul>
+        		<li>
+        		<div class="knowledge maybe-red maybe-green maybe-blue  maybe-two maybe-yellow maybe-black">
+						<span class="color">■</span><span class="color">■</span><span class="color">■</span><span class="color">■</span><span class="color">■</span>
+						<span class="number">1</span><span class="number">2</span><span class="number">3</span><span class="number">4</span><span class="number">5</span>
+					</div>
+					<img class="card" src="/images/cards/3-blue.png"></li>
+               	<li>
+               	<div class="knowledge maybe-red maybe-green maybe-blue  maybe-two maybe-yellow maybe-black">
+						<span class="color">■</span><span class="color">■</span><span class="color">■</span><span class="color">■</span><span class="color">■</span>
+						<span class="number">1</span><span class="number">2</span><span class="number">3</span><span class="number">4</span><span class="number">5</span>
+					</div>
+					<img class="card" src="/images/cards/2-green.png"></li>
+           	    <li>
+           	    <div class="knowledge maybe-red maybe-green maybe-blue  maybe-two maybe-yellow maybe-black">
+						<span class="color">■</span><span class="color">■</span><span class="color">■</span><span class="color">■</span><span class="color">■</span>
+						<span class="number">1</span><span class="number">2</span><span class="number">3</span><span class="number">4</span><span class="number">5</span>
+					</div>
+					<img class="card" src="/images/cards/3-blue.png"></li>
+				<li>
+				<div class="knowledge maybe-red maybe-green maybe-blue  maybe-two maybe-yellow maybe-black">
+						<span class="color">■</span><span class="color">■</span><span class="color">■</span><span class="color">■</span><span class="color">■</span>
+						<span class="number">1</span><span class="number">2</span><span class="number">3</span><span class="number">4</span><span class="number">5</span>
+					</div>
+					<img class="card" src="/images/cards/2-green.png"></li>
+      	      	<li>
+      	      	<div class="knowledge maybe-red maybe-green maybe-blue  maybe-two maybe-yellow maybe-black">
+						<span class="color">■</span><span class="color">■</span><span class="color">■</span><span class="color">■</span><span class="color">■</span>
+						<span class="number">1</span><span class="number">2</span><span class="number">3</span><span class="number">4</span><span class="number">5</span>
+					</div>
+					<img class="card" src="/images/cards/3-black.png"></li>
+      	  	</ul>
           	 </div>
         	<div id="hand4" class="hand">
-    			<img class="card" src="/images/cards/3-blue.png">
-         	  	<img class="card" src="/images/cards/2-green.png">
-           		<img class="card" src="/images/cards/3-blue.png">
-				<img class="card" src="/images/cards/2-green.png">
-              	<img class="card" src="/images/cards/3-black.png">
+    		<ul>
+        		<li>
+        		<div class="knowledge maybe-red maybe-green maybe-blue  maybe-two maybe-yellow maybe-black">
+						<span class="color">■</span><span class="color">■</span><span class="color">■</span><span class="color">■</span><span class="color">■</span>
+						<span class="number">1</span><span class="number">2</span><span class="number">3</span><span class="number">4</span><span class="number">5</span>
+					</div>
+					<img class="card" src="/images/cards/3-blue.png"></li>
+               	<li>
+               	<div class="knowledge maybe-red maybe-green maybe-blue  maybe-two maybe-yellow maybe-black">
+						<span class="color">■</span><span class="color">■</span><span class="color">■</span><span class="color">■</span><span class="color">■</span>
+						<span class="number">1</span><span class="number">2</span><span class="number">3</span><span class="number">4</span><span class="number">5</span>
+					</div>
+					<img class="card" src="/images/cards/2-green.png"></li>
+           	    <li>
+           	    <div class="knowledge maybe-red maybe-green maybe-blue  maybe-two maybe-yellow maybe-black">
+						<span class="color">■</span><span class="color">■</span><span class="color">■</span><span class="color">■</span><span class="color">■</span>
+						<span class="number">1</span><span class="number">2</span><span class="number">3</span><span class="number">4</span><span class="number">5</span>
+					</div>
+					<img class="card" src="/images/cards/3-blue.png"></li>
+				<li>
+				<div class="knowledge maybe-red maybe-green maybe-blue  maybe-two maybe-yellow maybe-black">
+						<span class="color">■</span><span class="color">■</span><span class="color">■</span><span class="color">■</span><span class="color">■</span>
+						<span class="number">1</span><span class="number">2</span><span class="number">3</span><span class="number">4</span><span class="number">5</span>
+					</div>
+					<img class="card" src="/images/cards/2-green.png"></li>
+      	      	<li>
+      	      	<div class="knowledge maybe-red maybe-green maybe-blue  maybe-two maybe-yellow maybe-black">
+						<span class="color">■</span><span class="color">■</span><span class="color">■</span><span class="color">■</span><span class="color">■</span>
+						<span class="number">1</span><span class="number">2</span><span class="number">3</span><span class="number">4</span><span class="number">5</span>
+					</div>
+					<img class="card" src="/images/cards/3-black.png"></li>
+      	  	</ul>
             </div>
             <div id="hand5" class="hand">
-    			<img class="card" src="/images/cards/3-blue.png">
-         	  	<img class="card" src="/images/cards/2-green.png">
-           		<img class="card" src="/images/cards/3-blue.png">
-				<img class="card" src="/images/cards/2-green.png">
-              	<img class="card" src="/images/cards/3-black.png">
+    		<ul>
+        		<li>
+        		<div class="knowledge maybe-red maybe-green maybe-blue  maybe-two maybe-yellow maybe-black">
+						<span class="color">■</span><span class="color">■</span><span class="color">■</span><span class="color">■</span><span class="color">■</span>
+						<span class="number">1</span><span class="number">2</span><span class="number">3</span><span class="number">4</span><span class="number">5</span>
+					</div>
+					<img class="card" src="/images/cards/3-blue.png"></li>
+               	<li>
+               	<div class="knowledge maybe-red maybe-green maybe-blue  maybe-two maybe-yellow maybe-black">
+						<span class="color">■</span><span class="color">■</span><span class="color">■</span><span class="color">■</span><span class="color">■</span>
+						<span class="number">1</span><span class="number">2</span><span class="number">3</span><span class="number">4</span><span class="number">5</span>
+					</div>
+					<img class="card" src="/images/cards/2-green.png"></li>
+           	    <li>
+           	    <div class="knowledge maybe-red maybe-green maybe-blue  maybe-two maybe-yellow maybe-black">
+						<span class="color">■</span><span class="color">■</span><span class="color">■</span><span class="color">■</span><span class="color">■</span>
+						<span class="number">1</span><span class="number">2</span><span class="number">3</span><span class="number">4</span><span class="number">5</span>
+					</div>
+					<img class="card" src="/images/cards/3-blue.png"></li>
+				<li>
+				<div class="knowledge maybe-red maybe-green maybe-blue  maybe-two maybe-yellow maybe-black">
+						<span class="color">■</span><span class="color">■</span><span class="color">■</span><span class="color">■</span><span class="color">■</span>
+						<span class="number">1</span><span class="number">2</span><span class="number">3</span><span class="number">4</span><span class="number">5</span>
+					</div>
+					<img class="card" src="/images/cards/2-green.png"></li>
+      	      	<li>
+      	      	<div class="knowledge maybe-red maybe-green maybe-blue  maybe-two maybe-yellow maybe-black">
+						<span class="color">■</span><span class="color">■</span><span class="color">■</span><span class="color">■</span><span class="color">■</span>
+						<span class="number">1</span><span class="number">2</span><span class="number">3</span><span class="number">4</span><span class="number">5</span>
+					</div>
+					<img class="card" src="/images/cards/3-black.png"></li>
+      	  	</ul>
             </div>		
     </div>
     			
