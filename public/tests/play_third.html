@@ -28,7 +28,7 @@
             flex-flow: row nowrap;
             padding: 0px;
             margin:0px;
-            flex: 0 1 auto;
+            flex: 0 0 auto;
         }
         .card {
             width: 73px;
@@ -46,16 +46,20 @@
         	display: flex;
         	flex-flow: row nowrap;
         	width: 100%;
-        	flex: 5 1 auto;
         }
         #clues-hearts-deck{
+            display: flex;
         	flex: 1 1 auto;
         }
         #play-field{
-        	flex: 7 1 auto;
+            display: flex;
+        	flex: 3 1 auto;
         }
         #discard{
-        	flex: 7 1 auto;
+        	display: flex;
+            width: 50%;
+            flex-flow: row wrap;
+            flex: 3 0 auto;
         }
         #discard ul{
 			list-style:none;
@@ -70,7 +74,7 @@
             flex-flow: row nowrap;
             padding: 0px;
             margin:0px;
-            flex: 0 1 auto;
+            flex: 0 0 auto;
             margin:0px;
         }
         .hand{
@@ -218,20 +222,20 @@
 </head>
 
 <body>
-    <div id="game-area">
-        <div id="hand12" class="hand-contents">
-        	<div id="hand0" class="hand">
-				<ul class="card-list">	
+    <div id="hand12" class="hand-contents">
+      	<div id="hand0" class="hand">
+			<ul class="card-list">	
         		<img class="card" src="/images/cards/3-blue.png">
                	<img class="card" src="/images/cards/2-green.png">
            	    <img class="card" src="/images/cards/3-blue.png">
 				<img class="card" src="/images/cards/2-green.png">
       	      	<img class="card" src="/images/cards/3-black.png">
-				<ul>
-          	  </div>
-        	<div id="hand1" class="hand">
-			
-					<ul class="card-list">
+			<ul>
+        </div>
+    </div>
+    <div id="game-area">
+    	<div id="hand1" class="hand">
+			<ul class="card-list">
 				<li>
     				<div class="knowledge maybe-four maybe-green maybe-blue  maybe-two maybe-yellow maybe-black">
 					<span class="color">■</span><span class="color">■</span><span class="color">■</span><span class="color">■</span><span class="color">■</span>
@@ -255,8 +259,7 @@
 				<li>
               		<img class="card" src="/images/cards/3-black.png">
 				</li>
-				</ul>
-        	</div>		
+			</ul>
         </div>
     </div>
     <div id="tableau">
@@ -315,7 +318,7 @@
 				</ul>
             </div>		
     </div>
-    			
+</body>  			
     			
     			
     			
