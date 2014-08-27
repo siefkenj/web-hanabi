@@ -43,7 +43,7 @@ function createNewGame(numPlayers) {
     var game = {
         players: [],
         deck: shuffle(deck),
-        discard: {},
+        discard: [],
         tableau: {},
         clueTokens: 8,
         maxClueTokens: 8,

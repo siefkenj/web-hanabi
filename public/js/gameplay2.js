@@ -36,17 +36,22 @@ function extendByArray (a, arr) {
 }
 
 //add an event lister if none exists otherwise do nothing
-function initializeListener(obj, type, callback) {
-    if (!obj.hasAttribute('x-callback')) {
-        obj.setAttribute('x-callback', 1)
-        obj.addEventListener(type, callback)
+function initializeListener(obj, type, callback, options) {
+    if ( options && options.override ) {
+        removeListener(obj, type)
+    }
+    if ( !obj.hasAttribute('x-callback') ) {
+        obj.setAttribute('x-callback', 1);
+        obj.addEventListener(type, callback);
+        obj.listener = callback;
     }
 }
 
-function removeListener(obj, type, callback){
-    if (obj.hasAttribute('x-callback')) {
+function removeListener(obj, type){
+    if ( obj.hasAttribute('x-callback') ) {
         obj.removeAttribute('x-callback')
-        obj.removeEventListener(type, callback)
+        obj.removeEventListener(type, obj.listener)
+        obj.listener = null;
     }
 }
 
@@ -66,7 +71,6 @@ function getKnowledgeClasses(card) {
 
 function updateScreen(game, others, me, socket, currPlayerId, myId) {
     var i;
-    console.log('updating screen', Array.prototype.slice.call(arguments))
     // clear the screen of all information
     var cardLists = document.querySelectorAll('.card-list');
     for(i = 0; i < cardLists.length; i++){
@@ -79,11 +83,9 @@ function updateScreen(game, others, me, socket, currPlayerId, myId) {
     var knowledgeButtons = document.querySelector('.instruction');
     knowledgeButtons.setAttribute('style', 'display: none;');
     // setup all other player's hands
-    console.log('pre setup', others.length)
     for(i = 0; i < others.length; i++){
         var handDiv = document.querySelector("#hand" + i + ' .card-list');
         setupHand(others[i].hand, handDiv, i);
-        console.log('setting up others hand', JSON.stringify(others[i].hand))
         // set the players hand that
     }
 
@@ -130,6 +132,8 @@ function updateScreen(game, others, me, socket, currPlayerId, myId) {
                 }
                 game.clueTokens--;
                 setKnowledge(others[playerNumber].hand, instruction)
+
+                game.aatime = Date()
 		        socket.emit('game-update', game);
                 break;
         }
@@ -164,24 +168,26 @@ function updateScreen(game, others, me, socket, currPlayerId, myId) {
     //set up the discard and the tableau
     var discard = document.querySelector("#discard")
     var playfield = document.querySelector("#play-field")
-    setupTableau(discard ,playfield)
+    setupTableau(game, discard ,playfield)
 
 
     var myHandClick = function (e){
         var target = e.currentTarget;
         var instructionType = e.originalTarget.getAttribute('x-button')
         var cardIndex = target.getAttribute('x-card-index')
-        myHandInstruction(game, target, instructionType, cardIndex, me, socket)
+        myHandInstruction(game, target, instructionType, cardIndex, me, socket);
     }
 
-    initializeListener(myHandButtons, 'click', myHandClick)
+    initializeListener(myHandButtons, 'click', myHandClick, { override: true })
 }
 
-function setupTableau(discardArea, playfieldArea){
-    var s = "<ul>"
-    for(var cards in game.discard){
+function setupTableau(game, discardArea, playfieldArea){
+    var i;
+    var s = "<ul>";
+    for (i = 0; i < game.discard.length; i++) {
+        var card  = game.discard[i];
         s += "<li>";
-        s += "<img class='card' src='/images/cards/" + game.discard[cards].number + "-" + game.discard[cards].color + ".png' />";
+        s += "<img class='card' src='/images/cards/" + card.number + "-" + card.color + ".png' />";
         s += "</li>";
     }
     s += "</ul>"
@@ -196,16 +202,14 @@ function myHandInstruction(game, target, instructionType, cardIndex, me, socket)
         case "play-card":
             break;
         case "discard-card":
-            game.clueTokens = Math.min(game.clueTokens + 1, game.maxClueTokens)
+            game.clueTokens = game.clueTokens + 1 //Math.min(game.clueTokens + 1, game.maxClueTokens)
             var playedCard = me.hand.splice(cardIndex, 1)[0];
-            var s = ''
-            s += playedCard.color + playedCard.number
-            //need to account for the fact that the discard can have duplicate cards
-            //the card is already there then just say that there is one more being added otherwise just add it to the discard
-            playedCard.duplicate = 	playedCard.duplicate ? playedCard.duplicate++ : 1
-            game.discard[s] = playedCard
-            //add a new card to your hand
+            // put the played card on the discard pile
+            game.discard.push(playedCard)
+            // add a new card to your hand
             me.hand.push(game.deck.pop());
+
+            game.aatime = Date()
             socket.emit('game-update', game);
             break;
     }
@@ -309,7 +313,6 @@ window.onload = function() {
 
     //update the screen based on an incoming game object
     socket.on("update-data", function(gameTemp){
-        console.log('getting initialized')
         game = gameTemp;
         me = getPlayerById(game, myId);
         others = [];
