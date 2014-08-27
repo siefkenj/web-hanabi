@@ -182,9 +182,7 @@ function updateScreen(game, others, me, socket, currPlayerId, myId) {
 }
 
 function setupTableau(game, discardArea, playfieldArea){
-    var i, j;
-
-    // set up the discard area
+    var i;
     var s = "<ul>";
     for (i = 0; i < game.discard.length; i++) {
         var card  = game.discard[i];
@@ -194,43 +192,10 @@ function setupTableau(game, discardArea, playfieldArea){
     }
     s += "</ul>"
     discardArea.innerHTML = s;
-
-    // set up the playfield
-    var s = "<ul>";
-    for (i in game.tableau) {
-        var stack = game.tableau[i];
-        s += "<li><ul class='card-stack'>";
-        for (j = 0; j < stack.length; j++) {
-            var card = stack[j];
-            s += "<li>";
-            s += "<img class='card' src='/images/cards/" + card.number + "-" + card.color + ".png' />";
-            s += "</li>";
-        }
-        s += "</ul></li>";
-    }
-    s += "</ul>"
-    playfieldArea.innerHTML = s;
-
 }
 
-// returns whether a card is playable in the current game
 function isCardPlayable(game, card) {
-    if (card.number == 1) {
-        // if the card is a 1 and there is no stack of that color, its allowed
-        if (!game.tableau[card.color]) {
-            return true;
-        }
-    } else {
-        // get a list of every number on the current card stack and find the max
-        var numbers = (game.tableau[card.color] || []).map(function (x) { return parseInt(x.number, 10); });
-        var maxNumOnPile = Math.max.apply(null, numbers);
-        // if our number is the max plus one, we're playable
-        if (parseInt(card.number, 10) == maxNumOnPile + 1) {
-            return true;
-        }
-    }
-    // if we didn't meet the above conditions, we're not playable
-    return false;
+    //if 
 }
 
 function myHandInstruction(game, target, instructionType, cardIndex, me, socket){
@@ -239,23 +204,6 @@ function myHandInstruction(game, target, instructionType, cardIndex, me, socket)
             myHandButtons.setAttribute('style', 'display: none;');
             break;
         case "play-card":
-            var playedCard = me.hand.splice(cardIndex, 1)[0];
-            if (isCardPlayable(game, playedCard)) {
-                game.tableau[playedCard.color] = (game.tableau[playedCard.color] || []);
-                game.tableau[playedCard.color].push(playedCard);
-
-                if (playedCard.number == 5) {
-                    game.clueTokens = Math.min(game.clueTokens + 1, game.maxClueTokens)
-                }
-            } else {
-                // put the played card on the discard pile
-                game.discard.push(playedCard);
-                game.hearts = game.hearts - 1
-            }
-            // add a new card to your hand
-            me.hand.push(game.deck.pop());
-
-            socket.emit('game-update', game);
             break;
         case "discard-card":
             game.clueTokens = Math.min(game.clueTokens + 1, game.maxClueTokens)
