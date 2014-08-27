@@ -202,7 +202,7 @@ function myHandInstruction(game, target, instructionType, cardIndex, me, socket)
         case "play-card":
             break;
         case "discard-card":
-            game.clueTokens = game.clueTokens + 1 //Math.min(game.clueTokens + 1, game.maxClueTokens)
+            game.clueTokens = Math.min(game.clueTokens + 1, game.maxClueTokens)
             var playedCard = me.hand.splice(cardIndex, 1)[0];
             // put the played card on the discard pile
             game.discard.push(playedCard)
