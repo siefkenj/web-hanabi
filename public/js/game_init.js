@@ -43,8 +43,8 @@ function createNewGame(numPlayers) {
     var game = {
         players: [],
         deck: shuffle(deck),
-        discard: [ [],[],[],[],[],[] ],
-        tableau: [ [],[],[],[],[],[] ],
+        discard: {},
+        tableau: {},
         clueTokens: 8,
         maxClueTokens: 8,
         hearts: 3,
@@ -65,7 +65,7 @@ function createNewGame(numPlayers) {
     }
     
     //add on cards that are blank to the end of the deck to deal with the final round.
-    for (i = 0; i < 5; i++){
+    for (i = 0; i < numPlayers; i++){
     	game.deck.unshift({color: 'blank', number: 'blank', impossible: []});
     }
 

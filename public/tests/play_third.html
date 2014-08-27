@@ -31,7 +31,7 @@
             flex: 0 1 auto;
         }
         .card {
-			width: 73px;
+            width: 73px;
 			height: 110px;
 			background: white;
 			margin:2px;
@@ -57,6 +57,14 @@
         #discard{
         	flex: 7 1 auto;
         }
+        #discard ul{
+			list-style:none;
+			margin: 0px;
+			padding: 0px;
+		}
+		#discard li{
+			display: inline-block;
+		}	
         #hand345 {
         	display: flex;
             flex-flow: row nowrap;
@@ -262,6 +270,11 @@
     </div>
      <div id="hand345" class="hand-contents">
         	<div id="hand2" class="hand">
+				<ul class="instruction">
+					<li x-button='tell-color' >Tell Color</li>
+					<li x-button='tell-number'>Tell Number</li>
+        			<li x-button='cancel'>Cancel</li>
+				</ul>
 				<ul class="card-list">	
         		<img class="card" >
 				<img class="card" src="/images/cards/2-green.png">
@@ -272,8 +285,8 @@
           	 </div>
         	<div id="my-hand" class="hand">
 				<ul class="instruction">
-					<li x-button='tell-color' >Tell Color</li>
-					<li x-button='tell-number'>Tell Number</li>
+					<li x-button='discard-card' >Discard Card</li>
+					<li x-button='play-card'>Play Card</li>
         			<li x-button='cancel'>Cancel</li>
 				</ul>
 				<ul class="card-list">	

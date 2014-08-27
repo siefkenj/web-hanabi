@@ -1,7 +1,7 @@
 "use strict";
 
 //used for testing everyone ready behaviour.
-var pageRedirect = "/tests/ready.html";
+var pageRedirect = "/tests/play_third.html";
 
 function parseUriSearchString (str) {
     // Remove leading questionmark

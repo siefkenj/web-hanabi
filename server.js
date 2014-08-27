@@ -27,7 +27,7 @@ var http = require('http');
 var server = http.createServer(app);
 var io = require('socket.io').listen(server);
 var game_init = require('./public/js/game_init');
-
+io.set('log level', 1) // reduce the debug messages
 
 // Statically server pages from the public directory
 app.configure( function() {
@@ -177,14 +177,14 @@ io.sockets.on('connection', function(socket) {
     socket.on('start-game', function(){
         var room = socket.hanabiData.currentRoom;
         console.log("starting game in room", room);
-        socket.emit('update-data', gamesList[room]);
+        socket.emit('initialize-game', gamesList[room]);
     });
 
     socket.on('game-update', function(game){
        var room = socket.hanabiData.currentRoom;
        game.currentPlayer = game.currentPlayer + 1;
        gamesList[room] = game;
-       console.log(gamesList[room]);
+       console.log(gamesList[room].discard );
 	   socket.in(room).broadcast.emit('update-data', gamesList[room]);
        
        socket.emit('update-data', gamesList[room]);      
