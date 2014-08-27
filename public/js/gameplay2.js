@@ -138,7 +138,7 @@ function updateScreen(game, others, me, socket, currPlayerId, myId) {
                 break;
         }
     }
-    initializeListener(knowledgeButtons, 'click', instructionClick);
+    initializeListener(knowledgeButtons, 'click', instructionClick, { override: true });
 
     // set up our own hand
     setupMyHand(me.hand,document.querySelector("#my-hand .card-list"));
@@ -156,7 +156,7 @@ function updateScreen(game, others, me, socket, currPlayerId, myId) {
             myHandButtons.setAttribute('x-card-index', cardIndex)
         }
     }
-    initializeListener(mydiv, 'click', clickedMyHand);
+    initializeListener(mydiv, 'click', clickedMyHand, { override: true });
 
     //set up hearts
     document.querySelector('#hearts-display').innerHTML = game.hearts
@@ -168,7 +168,7 @@ function updateScreen(game, others, me, socket, currPlayerId, myId) {
     //set up the discard and the tableau
     var discard = document.querySelector("#discard")
     var playfield = document.querySelector("#play-field")
-    setupTableau(game, discard ,playfield)
+    setupTableau(game, discard, playfield)
 
 
     var myHandClick = function (e){
@@ -194,6 +194,10 @@ function setupTableau(game, discardArea, playfieldArea){
     discardArea.innerHTML = s;
 }
 
+function isCardPlayable(game, card) {
+    //if 
+}
+
 function myHandInstruction(game, target, instructionType, cardIndex, me, socket){
     switch(instructionType){
         case "cancel":
@@ -209,7 +213,6 @@ function myHandInstruction(game, target, instructionType, cardIndex, me, socket)
             // add a new card to your hand
             me.hand.push(game.deck.pop());
 
-            game.aatime = Date()
             socket.emit('game-update', game);
             break;
     }
