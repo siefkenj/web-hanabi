@@ -36,7 +36,7 @@ function createNewGame(numPlayers) {
     for (var i = 0; i < colors.length; i++) {
         var color = colors[i];
         deck = deck.concat(numStack.map(function (number) {
-            return {color: color, number: number, impossible: []};
+            return {color: color, number: number, impossible: {}};
         }));
     }
 
@@ -66,7 +66,7 @@ function createNewGame(numPlayers) {
     
     //add on cards that are blank to the end of the deck to deal with the final round.
     for (i = 0; i < numPlayers; i++){
-    	game.deck.unshift({color: 'blank', number: 'blank', impossible: []});
+    	game.deck.unshift({color: 'blank', number: 'blank', impossible: {}});
     }
 
     return game;

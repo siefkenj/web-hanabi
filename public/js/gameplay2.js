@@ -260,16 +260,17 @@ function setKnowledge(hand, knowledge) {
         instructionType = 'color'
     }
     var excludedInfo = allInfo.filter(function(x) { return x != knowledge });
-    for (var i=0; i < hand.length; i++){
-        if(hand[i][instructionType] == knowledge){ // hand[i]['color']
+    for (var i=0; i < hand.length; i++) {
+        if (hand[i][instructionType] == knowledge) { // hand[i]['color']
             extendByArray(hand[i].impossible, excludedInfo);
-        }
-        else{
+            console.log('excluded', excludedInfo)
+        } else {
             hand[i].impossible[knowledge] = true;
+        }
     }
 }
 
-}window.onload = function() {
+window.onload = function() {
 	// grab the name and room from the URI search string
     // get a few globals
     // some of these may be redundant
@@ -293,10 +294,14 @@ function setKnowledge(hand, knowledge) {
    
     socket.emit("set-name", name);
     socket.emit("set-room", room); 
-    //go get the game object
+    // emitting this signal will trigger the initalize-game signal
+    // and cause the server to send us a copy of the game object.
     socket.emit("start-game");
   
-   socket.on("initialize-game", function(gameTemp){
+
+    // the first time we get the game object, we need to assign
+    // a spot for every player.
+    socket.on("initialize-game", function(gameTemp){
         game = gameTemp;
         me = getPlayerById(game, myId);
         others = [];
@@ -324,29 +329,6 @@ function setKnowledge(hand, knowledge) {
 
     return;
 
-	function setKnowledgeColor(event){
-		var target = event.currentTarget;
-		var player = game.players[target.title];
-		var info = target.innerHTML.substring(5);
-		for (var i = 0; i < player.hand.length;i++){
-			if(player.hand[i].color != info){
-				player.hand[i].impossible.push(info);
-			}else{
-				var possibleKnowledge = ['red','green','blue','yellow','black'];
-				for(var j = 0; j < possibleKnowledge.length; j++){
-					if (info != possibleKnowledge[j] && player.hand[i].impossible.indexOf(info) == -1){
-						player.hand[i].impossible.push(possibleKnowledge[j]);
-					}
-				}
-			}
-		}
-		game.clueTokens = Math.max(game.clueTokens - 1, 0);
-       	clearInstructions();
-		broadcastNewGameState();
-	}
-    function broadcastNewGameState() {
-		socket.emit('game-update', game);
-	}
 	
 	/*These are the player actions, clicking on a cards activates either the
 	  clue action or the play card action*/
