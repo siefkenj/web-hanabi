@@ -64,10 +64,12 @@ function getKnowledgeClasses(card) {
 	return ret;
 }
 
-function updateScreen(game, others, me, socket, currPlayerId, myId){
-    // clear the screen of all information 
+function updateScreen(game, others, me, socket, currPlayerId, myId) {
+    var i;
+    console.log('updating screen', Array.prototype.slice.call(arguments))
+    // clear the screen of all information
     var cardLists = document.querySelectorAll('.card-list');
-    for(var i = 0; i < cardLists.length; i++){
+    for(i = 0; i < cardLists.length; i++){
         cardLists[i].innerHTML = "";
     }
     // delete the discard pile?
@@ -77,32 +79,38 @@ function updateScreen(game, others, me, socket, currPlayerId, myId){
     var knowledgeButtons = document.querySelector('.instruction');
     knowledgeButtons.setAttribute('style', 'display: none;');
     // setup all other player's hands
-    for(var i = 0; i < others.length; i++){
+    console.log('pre setup', others.length)
+    for(i = 0; i < others.length; i++){
         var handDiv = document.querySelector("#hand" + i + ' .card-list');
-        setupHand(others[i].hand, handDiv, i); 
-        // set the players hand that 
+        setupHand(others[i].hand, handDiv, i);
+        console.log('setting up others hand', JSON.stringify(others[i].hand))
+        // set the players hand that
     }
-    for(var i = 0; i < others.length; i++){
-            var handDiv = document.querySelector("#hand" + i);
-            //click listener for others' hands
-            var clickedOnOther = function(e) {
-                if (e.originalTarget.className == "card") {
-                    var target = e.originalTarget;
-                    var playerNumber = target.getAttribute('x-player-number');
-                    var cardIndex = target.getAttribute('x-card-index');
-                    var cardColor = others[playerNumber].hand[cardIndex].color
-                    var cardNumber =others[playerNumber].hand[cardIndex].number
-                    // show the buttons
-                    e.currentTarget.appendChild(knowledgeButtons);
-                    knowledgeButtons.setAttribute('style', '');
-                    knowledgeButtons.setAttribute('x-color', cardColor);
-                    knowledgeButtons.setAttribute('x-number', cardNumber);
-                    knowledgeButtons.setAttribute('x-player-number', playerNumber)
-                }
-            }
-            initializeListener(handDiv, 'click', clickedOnOther)
+
+    // click listener for others' hands.  This pops up the
+    // menu where you can choose what information to give
+    var clickedOnOther = function(e) {
+        if (e.originalTarget.className == "card") {
+            var target = e.originalTarget;
+            var playerNumber = target.getAttribute('x-player-number');
+            var cardIndex = target.getAttribute('x-card-index');
+            var cardColor = others[playerNumber].hand[cardIndex].color
+            var cardNumber =others[playerNumber].hand[cardIndex].number
+            // show the buttons
+            e.currentTarget.appendChild(knowledgeButtons);
+            knowledgeButtons.setAttribute('style', '');
+            knowledgeButtons.setAttribute('x-color', cardColor);
+            knowledgeButtons.setAttribute('x-number', cardNumber);
+            knowledgeButtons.setAttribute('x-player-number', playerNumber)
         }
-    //setup the instruction Click for the others hands, this is for the knowledge buttons that we are moving around.
+    }
+    // attach the listener to everyones hands
+    for(i = 0; i < others.length; i++) {
+        var handDiv = document.querySelector("#hand" + i);
+        initializeListener(handDiv, 'click', clickedOnOther)
+    }
+
+    // setup the instruction clicks for the information menu.
     var instructionClick = function (e){
         var target = e.currentTarget;
         var instructionType = e.originalTarget.getAttribute('x-button')
@@ -112,7 +120,7 @@ function updateScreen(game, others, me, socket, currPlayerId, myId){
         var instruction = instructionType == 'tell-color' ? instructionColor : instructionNumber;
         switch(instructionType){
             case "cancel":
-                knowledgeButtons.setAttribute('style', 'display: none;'); 
+                knowledgeButtons.setAttribute('style', 'display: none;');
                 break;
             case "tell-color":
                 console.log("setting color", instruction)
@@ -123,7 +131,7 @@ function updateScreen(game, others, me, socket, currPlayerId, myId){
                 game.clueTokens--;
                 setKnowledge(others[playerNumber].hand, instruction)
 		        socket.emit('game-update', game);
-                break;  
+                break;
         }
     }
     initializeListener(knowledgeButtons, 'click', instructionClick);
@@ -150,22 +158,22 @@ function updateScreen(game, others, me, socket, currPlayerId, myId){
     document.querySelector('#hearts-display').innerHTML = game.hearts
     // set up clues
     document.querySelector('#clue-display').innerHTML = game.clueTokens
-    // set up deck 
+    // set up deck
     document.querySelector('#deck-display').innerHTML = game.deck.length - 5 // XXX fix this hack
 
     //set up the discard and the tableau
     var discard = document.querySelector("#discard")
     var playfield = document.querySelector("#play-field")
     setupTableau(discard ,playfield)
-    
-    
+
+
     var myHandClick = function (e){
         var target = e.currentTarget;
         var instructionType = e.originalTarget.getAttribute('x-button')
-        var cardIndex = target.getAttribute('x-card-index') 
-        myHandInstruction(game, target, instructionType, cardIndex, me, socket)            
+        var cardIndex = target.getAttribute('x-card-index')
+        myHandInstruction(game, target, instructionType, cardIndex, me, socket)
     }
-   
+
     initializeListener(myHandButtons, 'click', myHandClick)
 }
 
@@ -175,7 +183,7 @@ function setupTableau(discardArea, playfieldArea){
         s += "<li>";
         s += "<img class='card' src='/images/cards/" + game.discard[cards].number + "-" + game.discard[cards].color + ".png' />";
         s += "</li>";
-    }	
+    }
     s += "</ul>"
     discardArea.innerHTML = s;
 }
@@ -183,7 +191,7 @@ function setupTableau(discardArea, playfieldArea){
 function myHandInstruction(game, target, instructionType, cardIndex, me, socket){
     switch(instructionType){
         case "cancel":
-            myHandButtons.setAttribute('style', 'display: none;'); 
+            myHandButtons.setAttribute('style', 'display: none;');
             break;
         case "play-card":
             break;
@@ -217,7 +225,7 @@ function setupMyHand(hand, parent) {
 
         //s += "<div class='card' x-card-index='" + i + "'></div>";
         s += "</li>";
-    }	
+    }
     parent.innerHTML = s;
 }
 
@@ -243,7 +251,7 @@ function setupHand(hand, parent, playerNumber) {
         s += "</div>";
         s += "<img class='card' x-card-index='" + i + "' src='/images/cards/" + hand[i].number + "-" + hand[i].color + ".png' x-player-number='" + playerNumber + "'/>";
         s += "</li>";
-    }	
+    }
     parent.innerHTML = s;
 }
 
@@ -291,17 +299,17 @@ window.onload = function() {
     // Set up the web socket
     var socket = io.connect();
     window.ss = socket;
-   
+
     socket.emit("set-name", name);
-    socket.emit("set-room", room); 
+    socket.emit("set-room", room);
     // emitting this signal will trigger the initalize-game signal
     // and cause the server to send us a copy of the game object.
     socket.emit("start-game");
-  
 
-    // the first time we get the game object, we need to assign
-    // a spot for every player.
-    socket.on("initialize-game", function(gameTemp){
+
+    //update the screen based on an incoming game object
+    socket.on("update-data", function(gameTemp){
+        console.log('getting initialized')
         game = gameTemp;
         me = getPlayerById(game, myId);
         others = [];
@@ -312,16 +320,10 @@ window.onload = function() {
 		    }
 	    }
         var currPlayerId = game.players[game.currentPlayer % game.players.length].id;
-        updateScreen(game,others, me, socket, currPlayerId,myId);
+        updateScreen(game, others, me, socket, currPlayerId, myId);
     });
-    //update the screen based on an incoming game object 
-    socket.on('update-data', function(gameTemp){
-        game = gameTemp
-        var currPlayerId = game.players[game.currentPlayer % game.players.length].id;
-        updateScreen(game,others, me, socket, currPlayerId,myId);
-    });
-    
-    // recieve information from server about our name and id
+
+    // receive information from server about our name and id
 	socket.on('id-info', function(data) {
 		name = data.name;
 		id = data.id;
@@ -329,7 +331,7 @@ window.onload = function() {
 
     return;
 
-	
+
 	/*These are the player actions, clicking on a cards activates either the
 	  clue action or the play card action*/
 
@@ -337,7 +339,7 @@ window.onload = function() {
 	function clue(event){
 		var target = event.currentTarget;
 		var cardname = (target.src.replace(/^.*[\\\/]/, '')).replace(/.png/, '');
-		var cardNumber = cardname.substring(0,1)	
+		var cardNumber = cardname.substring(0,1)
 		var cardColor = cardname.substring(2);
 		var s = "";
         if(game.clueTokens == 0){
@@ -354,47 +356,6 @@ window.onload = function() {
 		addInstructionListner();
 	}
 
-	function setKnowledgeColor(event){
-		var target = event.currentTarget;
-		var player = game.players[target.title];
-		var info = target.innerHTML.substring(5);
-		for (var i = 0; i < player.hand.length;i++){
-			if(player.hand[i].color != info){
-				player.hand[i].impossible.push(info);
-			}else{
-				var possibleKnowledge = ['red','green','blue','yellow','black'];
-				for(var j = 0; j < possibleKnowledge.length; j++){
-					if (info != possibleKnowledge[j] && player.hand[i].impossible.indexOf(info) == -1){
-						player.hand[i].impossible.push(possibleKnowledge[j]);
-					}
-				}
-			}
-		}
-		game.clueTokens = Math.max(game.clueTokens - 1, 0);
-       	clearInstructions();
-		broadcastNewGameState();
-	}
-
-	function setKnowledgeNumber(event){
-		var target = event.currentTarget;
-		var player = game.players[target.title];
-		var info = target.innerHTML.substring(5);
-		for (var i = 0; i < player.hand.length;i++){
-			if(player.hand[i].number != info){
-				player.hand[i].impossible.push(info);
-			}else{
-				var possibleKnowledge = ['1','2','3','4','5'];
-				for(var j = 0; j < possibleKnowledge.length; j++){
-					if (info != possibleKnowledge[j] && player.hand[i].impossible.indexOf(info) == -1){
-						player.hand[i].impossible.push(possibleKnowledge[j]);
-					}
-				}
-			}
-		}
-		game.clueTokens = Math.max(game.clueTokens - 1, 0);
-		broadcastNewGameState();
-		clearInstructions();
-	}
 
 	//When a card in your hand is clicked it draws the discard and play options to the screen
 	function myHandAction(event){
@@ -406,13 +367,13 @@ window.onload = function() {
 
 		var instructions = document.querySelector('#instruction')
 		instructions.innerHTML = s;
-		addInstructionListner();		
+		addInstructionListner();
 	}
 
 	// plays the selected card
 	function play(event){
 		var cardNumber = event.currentTarget.title;
-		var playedCard = me.hand.splice(cardNumber, 1)[0];	
+		var playedCard = me.hand.splice(cardNumber, 1)[0];
 		var cardNum = game.tableau[sortColor(playedCard.color)].length;
 		if(playedCard.number == cardNum + 1){
 			addSort(playedCard, game.tableau);
@@ -462,7 +423,7 @@ window.onload = function() {
 		// if we include a rainbow color
 		else
 			return 5;
-			
+
 	}
 
 	//sorts in order into arrays by their color
@@ -495,7 +456,7 @@ window.onload = function() {
 				if(hand[i][0]){
 					s += "<div class =" + hand[i][0].color +"><ul>";
 					for (var j = 0; j < hand[i].length; j++){
-					
+
 						s += "<li><img class='card' src='/images/cards/" + hand[i][j].number + "-" + hand[i][j]	.color + ".png' />";
 						s += "</li>";
 					}
@@ -537,7 +498,7 @@ window.onload = function() {
 		setupCards(game.tableau,  document.querySelector('#tableau'));
 		//could put some sort of toggle here to make these only happen if it is your turn.
 		var cards = document.querySelectorAll('#myHand .handContents .card');
-		if(iAmCurrentPlayer){		
+		if(iAmCurrentPlayer){
 			for (i=0; i < cards.length; i++) {
 				var card = cards[i];
 				card.addEventListener('click', myHandAction);
