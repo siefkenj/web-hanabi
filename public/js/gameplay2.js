@@ -69,16 +69,27 @@ function getKnowledgeClasses(card) {
     }
     return ret;
 }
+// end the game shows the score and allows quick access to the lobby
+function endGame(messageDiv, game) {
+        messageDiv.innerHTML = "<p>End of Game! You got " + game.score + " points! </p><p>Click here to return to Lobby</p>"
+        messageDiv.setAttribute('style', '');
+        messageDiv.addEventListener('click', function (e) {
+            lobbyUrl += window.location.search
+            document.location.href = lobbyUrl;                     
+        });
+}
 
 function updateScreen(game, others, me, socket, currPlayerId, myId) {
+    console.log(game.score, game.currentPlayer);
     var i;
     // clear the screen of all information
     var cardLists = document.querySelectorAll('.card-list');
     for (i = 0; i < cardLists.length; i++) {
         cardLists[i].innerHTML = "";
     }
-    // delete the discard pile?
-
+    var messageDiv = document.querySelector('#messages');
+    messageDiv.setAttribute('style', 'display: none;');
+    messageDiv.innerHTML == '';
 
     // hide the buttons, the first one found will be the instructions to move around
     var knowledgeButtons = document.querySelector('.instruction');
@@ -88,7 +99,14 @@ function updateScreen(game, others, me, socket, currPlayerId, myId) {
         var handDiv = document.querySelector("#hand" + i + ' .card-list');
         setupHand(others[i].hand, handDiv, i);
     }
+    // set up our own hand
+    setupMyHand(me.hand, document.querySelector("#my-hand .card-list"));
 
+    if(game.hearts == 0) {
+        endGame(messageDiv, game);
+        return;
+    }
+        
     // click listener for others' hands.  This pops up the
     // menu where you can choose what information to give
     var clickedOnOther = function (e) {
@@ -140,8 +158,6 @@ function updateScreen(game, others, me, socket, currPlayerId, myId) {
     }
     initializeListener(knowledgeButtons, 'click', instructionClick, { override: true });
 
-    // set up our own hand
-    setupMyHand(me.hand, document.querySelector("#my-hand .card-list"));
     //look for my hand buttons and hide them
     var myHandButtons = document.querySelector('#my-hand .instruction');
     myHandButtons.setAttribute('style', 'display: none;');
@@ -215,11 +231,12 @@ function setupTableau(game, discardArea, playfieldArea) {
 
 // returns whether a card is playable in the current game
 function isCardPlayable(game, card) {
-    length = game.tableau[card.color] ? game.tableau[card.color].length : 0;
-    console.log(length)
-    if (card.number == length + 1){
+    // checks if the length is undefined, if it is use 0 as the length.
+    var length = game.tableau[card.color] ? game.tableau[card.color].length : 0;
+    // if the card number is the length +1 then it is the right card to play otherwise it is invalid 
+    if (card.number == length + 1) {
         return true;
-    }else{
+    } else {
         return false;
     }
 }
@@ -234,7 +251,7 @@ function myHandInstruction(game, target, instructionType, cardIndex, me, socket)
             if (isCardPlayable(game, playedCard)) {
                 game.tableau[playedCard.color] = (game.tableau[playedCard.color] || []);
                 game.tableau[playedCard.color].push(playedCard);
-
+                game.score++;
                 if (playedCard.number == 5) {
                     game.clueTokens = Math.min(game.clueTokens + 1, game.maxClueTokens);
                 }
@@ -245,7 +262,6 @@ function myHandInstruction(game, target, instructionType, cardIndex, me, socket)
             }
             // add a new card to your hand
             me.hand.push(game.deck.pop());
-
             socket.emit('game-update', game);
             break;
         case "discard-card":

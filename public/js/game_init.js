@@ -45,6 +45,7 @@ function createNewGame(numPlayers) {
         deck: shuffle(deck),
         discard: [],
         tableau: {},
+        score: 0,
         clueTokens: 8,
         maxClueTokens: 8,
         hearts: 3,
@@ -68,7 +69,7 @@ function createNewGame(numPlayers) {
     for (i = 0; i < numPlayers; i++){
     	game.deck.unshift({color: 'blank', number: 'blank', impossible: {}});
     }
-
+    
     return game;
 }
 
