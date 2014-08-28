@@ -56,6 +56,7 @@
 			border-radius: 10px;
 			border: 1px solid #555;
 			transition: box-shadow .2s;
+            cursor: pointer;
 		}
 		.card-list .card:hover {
 			box-shadow: 0px 0px 15px yellow;
@@ -131,7 +132,6 @@
 			display: inline-block;
 		}
 		li:first-child .knowledge:before {
-			content: 'Could be:';
 			font-size: .7em;
 			position: absolute;
 			font-style: italic;
@@ -250,11 +250,34 @@
 		.hand {
 			position: relative;
 		}
-	</style>
-</head>
+        #messages {
+            padding: .5em 1em;
+			border-radius: 5px;
+			text-align: center;
+			color: white;
+			text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+			vertical-align: baseline;
+			box-sizing: border-box;
+			border: 1px solid white;
+            background-color: tomato;
+            color: white;
+            margin-left: -250px;
+            width: 500px;
+            font-weight: bold;
+            font-size: 2em;
+            text-align: center;
+            z-index:1;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            cursor: pointer;
+        }
+</style>
 
+</head>
+    <div id="messages"><p>Ths is</p></div>
 <body>
-	<div id="hand12" class="hand-contents">
+   	<div id="hand12" class="hand-contents">
 		<div id="hand0" class="hand">
 			<ul class="card-list">
 			</ul>
