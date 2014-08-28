@@ -215,24 +215,13 @@ function setupTableau(game, discardArea, playfieldArea) {
 
 // returns whether a card is playable in the current game
 function isCardPlayable(game, card) {
-    if (card.number == 1) {
-        // if the card is a 1 and there is no stack of that color, its allowed
-        if (!game.tableau[card.color]) {
-            return true;
-        }
-    } else {
-        // get a list of every number on the current card stack and find the max
-        var numbers = (game.tableau[card.color] || []).map(function (x) {
-            return parseInt(x.number, 10);
-        });
-        var maxNumOnPile = Math.max.apply(null, numbers);
-        // if our number is the max plus one, we're playable
-        if (parseInt(card.number, 10) == maxNumOnPile + 1) {
-            return true;
-        }
+    length = game.tableau[card.color] ? game.tableau[card.color].length : 0;
+    console.log(length)
+    if (card.number == length + 1){
+        return true;
+    }else{
+        return false;
     }
-    // if we didn't meet the above conditions, we're not playable
-    return false;
 }
 
 function myHandInstruction(game, target, instructionType, cardIndex, me, socket) {
