@@ -79,8 +79,28 @@ function endGame(messageDiv, game) {
         });
 }
 
+// records a move in the game log, also sets the game log to the move that is being logged.
+function logMove(game, name, other, instruction, color, number, isPlayed) {
+    if (instruction == "cancel") {
+        return;
+    } else if (other) {
+        var s = name + " told " + other + " about their " + color + "'s";
+    } else {
+        var type = instruction == "discard-card" ? "discard" : "card";
+        if (type == "discard") {
+            var s = name + ' ' + type + "ed a " + color + ' ' + number;
+        } else {
+            s = name + " tried to play a " + color + " " + number + " and was " 
+            s += isPlayed ? "" : "not ";
+            s += "successful";
+        }
+    }
+    game.lastAction = s;
+    game.gameLog.push(s);
+    console.log(game.gameLog, "last action ", game.lastAction);
+}
+
 function updateScreen(game, others, me, socket, currPlayerId, myId) {
-    console.log(game.score, game.currentPlayer);
     var i;
     // clear the screen of all information
     var cardLists = document.querySelectorAll('.card-list');
@@ -151,7 +171,7 @@ function updateScreen(game, others, me, socket, currPlayerId, myId) {
                 }
                 game.clueTokens--;
                 setKnowledge(others[playerNumber].hand, instruction);
-
+                logMove (game, me.name, others[playerNumber].name, instructionType, instruction, game); 
                 socket.emit('game-update', game);
                 break;
         }
@@ -191,7 +211,7 @@ function updateScreen(game, others, me, socket, currPlayerId, myId) {
         var target = e.currentTarget;
         var instructionType = e.originalTarget.getAttribute('x-button');
         var cardIndex = target.getAttribute('x-card-index');
-        myHandInstruction(game, target, instructionType, cardIndex, me, socket);
+        myHandInstruction(game, target, instructionType, cardIndex, me, socket, myHandButtons);
     }
 
     initializeListener(myHandButtons, 'click', myHandClick, { override: true })
@@ -241,14 +261,15 @@ function isCardPlayable(game, card) {
     }
 }
 
-function myHandInstruction(game, target, instructionType, cardIndex, me, socket) {
+function myHandInstruction(game, target, instructionType, cardIndex, me, socket, myHandButtons) {
     switch (instructionType) {
         case "cancel":
             myHandButtons.setAttribute('style', 'display: none;');
-            break;
+            return;
         case "play-card":
             var playedCard = me.hand.splice(cardIndex, 1)[0];
-            if (isCardPlayable(game, playedCard)) {
+            var isPlayed = isCardPlayable(game, playedCard);
+            if (isPlayed) {
                 game.tableau[playedCard.color] = (game.tableau[playedCard.color] || []);
                 game.tableau[playedCard.color].push(playedCard);
                 game.score++;
@@ -262,7 +283,6 @@ function myHandInstruction(game, target, instructionType, cardIndex, me, socket)
             }
             // add a new card to your hand
             me.hand.push(game.deck.pop());
-            socket.emit('game-update', game);
             break;
         case "discard-card":
             game.clueTokens = Math.min(game.clueTokens + 1, game.maxClueTokens);
@@ -271,10 +291,11 @@ function myHandInstruction(game, target, instructionType, cardIndex, me, socket)
             game.discard.push(playedCard);
                 // add a new card to your hand
             me.hand.push(game.deck.pop());
-
-            socket.emit('game-update', game);
             break;
     }
+    logMove(game, me.name, null, instructionType, playedCard.color, playedCard.number, isPlayed, game)
+    socket.emit('game-update', game);
+
 }
 
 function setupMyHand(hand, parent) {
@@ -339,7 +360,6 @@ function setKnowledge(hand, knowledge) {
     for (var i = 0; i < hand.length; i++) {
         if (hand[i][instructionType] == knowledge) { // hand[i]['color']
             extendByArray(hand[i].impossible, excludedInfo);
-            console.log('excluded', excludedInfo);
         } else {
             hand[i].impossible[knowledge] = true;
         }

@@ -50,7 +50,8 @@ function createNewGame(numPlayers) {
         maxClueTokens: 8,
         hearts: 3,
         currentPlayer: 0,
-        lastAction: null
+        lastAction: null,
+        gameLog: []
     };
    
     // populate each player's hand
