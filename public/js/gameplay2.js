@@ -167,6 +167,9 @@ messageDiv.innerHTML = "<p>This is the final round, Only one more Turn!</p>"
             knowledgeButtons.setAttribute('x-number', cardNumber);
             knowledgeButtons.setAttribute('x-player-number', playerNumber);
         }
+        if (myHandButtons.getAttribute('style') == '') {
+            myHandButtons.setAttribute('style', 'display: none;');
+        }
     }
 
     // attach the listener to everyones hands
@@ -214,6 +217,9 @@ messageDiv.innerHTML = "<p>This is the final round, Only one more Turn!</p>"
             var cardIndex = target.getAttribute('x-card-index');
             myHandButtons.setAttribute('style', '');
             myHandButtons.setAttribute('x-card-index', cardIndex);
+        }
+        if (knowledgeButtons.getAttribute('style') == '') {
+            knowledgeButtons.setAttribute('style', 'display: none;');
         }
     }
     initializeListener(mydiv, 'click', clickedMyHand, { override: true });
