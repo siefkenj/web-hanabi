@@ -84,18 +84,15 @@ function endGame(messageDiv, game) {
 }
 
 // records a move in the game log, also sets the game log to the move that is being logged. 
-// XXX this needs to be cleaned up the syntax is super confusing
-function logMove(game, name, other, instruction, color, number, isPlayed) {
-    if (instruction == "cancel") {
-        return;
-    } else if (other) {
-        var s = name + " told " + other + " about their " + color + "'s";
+function logMove (game, name, instruction, numberColor, isPlayed, other) {
+    if (other) {
+        var s = name + " told " + other + " about their " + numberColor + "'s";
     } else {
         var type = instruction == "discard-card" ? "discard" : "card";
         if (type == "discard") {
-            var s = name + ' ' + type + "ed a " + color + ' ' + number;
+            var s = name + ' ' + type + "ed a " + numberColor;
         } else {
-            s = name + " tried to play a " + color + " " + number + " and was " 
+            s = name + " tried to play a " + numberColor + " and was " 
             s += isPlayed ? "" : "not ";
             s += "successful";
         }
@@ -197,7 +194,7 @@ messageDiv.innerHTML = "<p>This is the final round, Only one more Turn!</p>"
                 }
                 game.clueTokens--;
                 setKnowledge(others[playerNumber].hand, instruction);
-                logMove (game, me.name, others[playerNumber].name, instructionType, instruction, game); 
+                logMove(game, me.name, instructionType, instruction, null, others[playerNumber].name); 
                 game.currentPlayer++;
                 socket.emit('game-update', game);
                 break;
@@ -314,7 +311,7 @@ function myHandInstruction(game, target, instructionType, cardIndex, me, socket,
     if (!game.finalRound) {
         me.hand.push(game.deck.pop());
     }
-    logMove(game, me.name, null, instructionType, playedCard.color, playedCard.number, isPlayed, game)
+    logMove(game, me.name, instructionType, playedCard.color + ' ' + playedCard.number, isPlayed)
     game.currentPlayer++;
     socket.emit('game-update', game);
 
