@@ -1,8 +1,11 @@
 'use strict';
 
+// determines whether the cards in your hand are blank or shown.
+var showCards = false;
 var lobbyUrl = "/tests/lobby.html";
 var game = null;
 
+//decode the URI to get player information
 function parseUriSearchString(str) {
     // Remove leading questionmark
     if (str.charAt(0) == '?') {
@@ -48,6 +51,7 @@ function initializeListener(obj, type, callback, options) {
     }
 }
 
+//if an event lister exists remove it from the object
 function removeListener(obj, type) {
     if (obj.hasAttribute('x-callback')) {
         obj.removeAttribute('x-callback');
@@ -79,7 +83,8 @@ function endGame(messageDiv, game) {
         });
 }
 
-// records a move in the game log, also sets the game log to the move that is being logged.
+// records a move in the game log, also sets the game log to the move that is being logged. 
+// XXX this needs to be cleaned up the syntax is super confusing
 function logMove(game, name, other, instruction, color, number, isPlayed) {
     if (instruction == "cancel") {
         return;
@@ -100,7 +105,9 @@ function logMove(game, name, other, instruction, color, number, isPlayed) {
     console.log(game.gameLog, "last action ", game.lastAction);
 }
 
+//updates all information based on the game object
 function updateScreen(game, others, me, socket, currPlayerId, myId) {
+    console.log(game.currentPlayer, "the final round is!!!!", game.finalRound, 'length of the deck', game.deck.length);
     var i;
     // clear the screen of all information
     var cardLists = document.querySelectorAll('.card-list');
@@ -120,11 +127,30 @@ function updateScreen(game, others, me, socket, currPlayerId, myId) {
         setupHand(others[i].hand, handDiv, i);
     }
     // set up our own hand
-    setupMyHand(me.hand, document.querySelector("#my-hand .card-list"));
+    setupMyHand(me.hand, document.querySelector("#my-hand .card-list"), showCards);
 
-    if(game.hearts == 0) {
+    //set up hearts
+    document.querySelector('#hearts-display').innerHTML = game.hearts;
+    // set up clues
+    document.querySelector('#clue-display').innerHTML = game.clueTokens;
+    // set up deck
+    document.querySelector('#deck-display').innerHTML = game.deck.length;
+
+    // end the game if there are no hearts or if this is the final round of play
+    if (game.hearts == 0 || game.finalRound == game.currentPlayer) {
         endGame(messageDiv, game);
         return;
+    }
+
+    //end the game after one more round if there are no more cards in the deck 
+    // if the finalRound is not defined and there are no more cards set the final round
+    if (!game.finalRound && game.deck.length == 0) {
+        game.finalRound = game.currentPlayer + game.players.length;
+messageDiv.innerHTML = "<p>This is the final round, Only one more Turn!</p>"
+        messageDiv.setAttribute('style', '');
+        messageDiv.addEventListener('click', function (e) {
+            messageDiv.setAttribute('style', 'display: none;');
+        });
     }
         
     // click listener for others' hands.  This pops up the
@@ -172,6 +198,7 @@ function updateScreen(game, others, me, socket, currPlayerId, myId) {
                 game.clueTokens--;
                 setKnowledge(others[playerNumber].hand, instruction);
                 logMove (game, me.name, others[playerNumber].name, instructionType, instruction, game); 
+                game.currentPlayer++;
                 socket.emit('game-update', game);
                 break;
         }
@@ -193,13 +220,6 @@ function updateScreen(game, others, me, socket, currPlayerId, myId) {
         }
     }
     initializeListener(mydiv, 'click', clickedMyHand, { override: true });
-
-    //set up hearts
-    document.querySelector('#hearts-display').innerHTML = game.hearts;
-    // set up clues
-    document.querySelector('#clue-display').innerHTML = game.clueTokens;
-    // set up deck
-    document.querySelector('#deck-display').innerHTML = game.deck.length - 5; // XXX fix this hack
 
     //set up the discard and the tableau
     var discard = document.querySelector("#discard");
@@ -261,6 +281,7 @@ function isCardPlayable(game, card) {
     }
 }
 
+// runs when the instruction buttons in our hand are clickes can choose between playing, cancelling move and discarding a card.
 function myHandInstruction(game, target, instructionType, cardIndex, me, socket, myHandButtons) {
     switch (instructionType) {
         case "cancel":
@@ -281,24 +302,26 @@ function myHandInstruction(game, target, instructionType, cardIndex, me, socket,
                 game.discard.push(playedCard);
                 game.hearts = game.hearts - 1;
             }
-            // add a new card to your hand
-            me.hand.push(game.deck.pop());
             break;
         case "discard-card":
             game.clueTokens = Math.min(game.clueTokens + 1, game.maxClueTokens);
             var playedCard = me.hand.splice(cardIndex, 1)[0];
             // put the played card on the discard pile
             game.discard.push(playedCard);
-                // add a new card to your hand
-            me.hand.push(game.deck.pop());
             break;
     }
+    // add a new card to your hand if its not the end of game
+    if (!game.finalRound) {
+        me.hand.push(game.deck.pop());
+    }
     logMove(game, me.name, null, instructionType, playedCard.color, playedCard.number, isPlayed, game)
+    game.currentPlayer++;
     socket.emit('game-update', game);
 
 }
 
-function setupMyHand(hand, parent) {
+// setup my hand, can either show the cards or hide the cards
+function setupMyHand(hand, parent, show) {
     var s = "";
     for (var i = 0; i < hand.length; i++) {
         var knowledge = getKnowledgeClasses(hand[i]).join(' ');
@@ -307,9 +330,9 @@ function setupMyHand(hand, parent) {
         s += "<div class='knowledge " + knowledge + "'>";
         s += '<span class="color">■</span><span class="color">■</span><span class="color">■</span><span class="color">■</span><span class="color">■</span>';
         s += '<span class="number">1</span><span class="number">2</span><span class="number">3</span><span class="number">4</span><span class="number">5</span>';
-        s += "</div>";
-        s += "<img class='card' x-card-index='" + i + "' src='/images/cards/" + hand[i].number + "-" + hand[i].color + ".png'/>";
-
+        s += "</div>"
+        //either show or hide the cards
+        s += show ? "<img class='card' x-card-index='" + i + "' src='/images/cards/" + hand[i].number + "-" + hand[i].color + ".png'/>" : "<div class='card' x-card-index='" + i + "'></div>";
         s += "</li>";
     }
     parent.innerHTML = s;

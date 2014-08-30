@@ -50,6 +50,7 @@ function createNewGame(numPlayers) {
         maxClueTokens: 8,
         hearts: 3,
         currentPlayer: 0,
+        finalRound: null,
         lastAction: null,
         gameLog: []
     };
@@ -64,11 +65,6 @@ function createNewGame(numPlayers) {
             id: (''+Math.random()).slice(2,5),
             hand: game.deck.splice(0,handSize)
         });
-    }
-    
-    //add on cards that are blank to the end of the deck to deal with the final round.
-    for (i = 0; i < numPlayers; i++){
-    	game.deck.unshift({color: 'blank', number: 'blank', impossible: {}});
     }
     
     return game;

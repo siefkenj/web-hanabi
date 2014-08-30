@@ -80,7 +80,6 @@ io.sockets.on('connection', function(socket) {
         }
 
     }
-
     function isRoomReady(room){
         for (var i = 0, clients = io.sockets.clients(room); i < clients.length; i++) {
         if (!clients[i].hanabiData.readyState) {
