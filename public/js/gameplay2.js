@@ -102,6 +102,17 @@ function logMove (game, name, instruction, numberColor, isPlayed, other) {
     console.log(game.gameLog, "last action ", game.lastAction);
 }
 
+// places a message in the message div, displays it and sets up a click event to return to to game
+function displayMessage (messageDiv, message) {
+    game.finalRound = game.currentPlayer + game.players.length;
+    messageDiv.innerHTML = "<p>" + message + "</p>"
+    messageDiv.setAttribute('style', '');
+    messageDiv.addEventListener('click', function (e) {
+        messageDiv.setAttribute('style', 'display: none;');
+    });
+
+}
+
 //updates all information based on the game object
 function updateScreen(game, others, me, socket, currPlayerId, myId) {
     console.log(game.currentPlayer, "the final round is!!!!", game.finalRound, 'length of the deck', game.deck.length);
@@ -143,11 +154,8 @@ function updateScreen(game, others, me, socket, currPlayerId, myId) {
     // if the finalRound is not defined and there are no more cards set the final round
     if (!game.finalRound && game.deck.length == 0) {
         game.finalRound = game.currentPlayer + game.players.length;
-messageDiv.innerHTML = "<p>This is the final round, Only one more Turn!</p>"
-        messageDiv.setAttribute('style', '');
-        messageDiv.addEventListener('click', function (e) {
-            messageDiv.setAttribute('style', 'display: none;');
-        });
+        var message = "This is the fina Round, only one turn left";
+        displayMessage(messageDiv, message);
     }
         
     // click listener for others' hands.  This pops up the
@@ -193,6 +201,8 @@ messageDiv.innerHTML = "<p>This is the final round, Only one more Turn!</p>"
             case "tell-color":
             case "tell-number":
                 if (game.clueTokens <= 0) {
+                    var message = "no clue tokens dummy!"
+                    displayMessage(messageDiv, message);
                     return;
                 }
                 game.clueTokens--;
