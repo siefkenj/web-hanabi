@@ -40,11 +40,9 @@ function extendByArray(a, arr) {
 }
 
 //add an event lister if none exists otherwise do nothing
-function initializeListener(obj, type, callback, options) {
-    if (options && options.override) {
-        removeListener(obj, type)
-    }
-    if (!obj.hasAttribute('x-callback')) {
+function initializeListener(obj, type, callback) {
+    removeListener(obj, type)
+    if (!obj.getAttribute('x-callback')) {
         obj.setAttribute('x-callback', 1);
         obj.addEventListener(type, callback);
         obj.listener = callback;
@@ -52,8 +50,8 @@ function initializeListener(obj, type, callback, options) {
 }
 
 //if an event lister exists remove it from the object
-function removeListener(obj, type) {
-    if (obj.hasAttribute('x-callback')) {
+function removeListener(obj, type, callback) {
+    if (obj.getAttribute('x-callback')) {
         obj.removeAttribute('x-callback');
         obj.removeEventListener(type, obj.listener);
         obj.listener = null;
@@ -99,12 +97,10 @@ function logMove (game, name, instruction, numberColor, isPlayed, other) {
     }
     game.lastAction = s;
     game.gameLog.push(s);
-    console.log(game.gameLog, "last action ", game.lastAction);
 }
 
 // places a message in the message div, displays it and sets up a click event to return to to game
 function displayMessage (messageDiv, message) {
-    game.finalRound = game.currentPlayer + game.players.length;
     messageDiv.innerHTML = "<p>" + message + "</p>"
     messageDiv.setAttribute('style', '');
     messageDiv.addEventListener('click', function (e) {
@@ -115,7 +111,6 @@ function displayMessage (messageDiv, message) {
 
 //updates all information based on the game object
 function updateScreen(game, others, me, socket, currPlayerId, myId) {
-    console.log(game.currentPlayer, "the final round is!!!!", game.finalRound, 'length of the deck', game.deck.length);
     var i;
     // clear the screen of all information
     var cardLists = document.querySelectorAll('.card-list');
@@ -131,11 +126,22 @@ function updateScreen(game, others, me, socket, currPlayerId, myId) {
     knowledgeButtons.setAttribute('style', 'display: none;');
     // setup all other player's hands
     for (i = 0; i < others.length; i++) {
-        var handDiv = document.querySelector("#hand" + i + ' .card-list');
-        setupHand(others[i].hand, handDiv, i);
+        var handDiv = document.querySelector("#hand" + i);
+        if (others[i].id == currPlayerId) {
+            handDiv.classList.add('current-player');
+        } else {
+            handDiv.classList.remove('current-player');
+        }
+        setupHand(others[i].hand, handDiv.querySelector('.card-list'), i);
     }
     // set up our own hand
-    setupMyHand(me.hand, document.querySelector("#my-hand .card-list"), showCards);
+    handDiv = document.querySelector("#my-hand")
+    if (myId == currPlayerId) {
+        handDiv.classList.add('current-player');
+    } else {
+        handDiv.classList.remove('current-player');
+    }
+    setupMyHand(me.hand, handDiv.querySelector('.card-list'), showCards, currPlayerId == myId);
 
     //set up hearts
     document.querySelector('#hearts-display').innerHTML = game.hearts;
@@ -145,7 +151,7 @@ function updateScreen(game, others, me, socket, currPlayerId, myId) {
     document.querySelector('#deck-display').innerHTML = game.deck.length;
 
     // end the game if there are no hearts or if this is the final round of play
-    if (game.hearts == 0 || game.finalRound == game.currentPlayer) {
+    if (game.hearts == 0 || game.finishingPlayer - game.currentPlayer % game.players.length == 0) {
         endGame(messageDiv, game);
         return;
     }
@@ -153,14 +159,18 @@ function updateScreen(game, others, me, socket, currPlayerId, myId) {
     //end the game after one more round if there are no more cards in the deck 
     // if the finalRound is not defined and there are no more cards set the final round
     if (!game.finalRound && game.deck.length == 0) {
-        game.finalRound = game.currentPlayer + game.players.length;
-        var message = "This is the fina Round, only one turn left";
+        game.finishingPlayer = game.currentPlayer;
+        game.finalRound = true;
+        var message = "This is the final Round, only one turn left";
         displayMessage(messageDiv, message);
     }
         
     // click listener for others' hands.  This pops up the
     // menu where you can choose what information to give
     var clickedOnOther = function (e) {
+        if (currPlayerId != myId) {
+            return;
+        }
         if (e.originalTarget.className == "card") {
             var target = e.originalTarget;
             var playerNumber = target.getAttribute('x-player-number');
@@ -175,7 +185,8 @@ function updateScreen(game, others, me, socket, currPlayerId, myId) {
             knowledgeButtons.setAttribute('x-number', cardNumber);
             knowledgeButtons.setAttribute('x-player-number', playerNumber);
         }
-        if (myHandButtons.getAttribute('style') == '') {
+        // check to see if the buttons are hidden
+        if (!myHandButtons.getAttribute('style').match(/display:\s*none/)) {
             myHandButtons.setAttribute('style', 'display: none;');
         }
     }
@@ -213,7 +224,7 @@ function updateScreen(game, others, me, socket, currPlayerId, myId) {
                 break;
         }
     }
-    initializeListener(knowledgeButtons, 'click', instructionClick, { override: true });
+    initializeListener(knowledgeButtons, 'click', instructionClick);
 
     //look for my hand buttons and hide them
     var myHandButtons = document.querySelector('#my-hand .instruction');
@@ -222,17 +233,26 @@ function updateScreen(game, others, me, socket, currPlayerId, myId) {
 
     // setup listner for our hand
     var clickedMyHand = function (e) {
+        if (currPlayerId != myId) {
+            return;
+        }
         if (e.originalTarget.className == "card") {
             var target = e.originalTarget;
             var cardIndex = target.getAttribute('x-card-index');
             myHandButtons.setAttribute('style', '');
             myHandButtons.setAttribute('x-card-index', cardIndex);
         }
-        if (knowledgeButtons.getAttribute('style') == '') {
+        // check to see if the buttons are hidden
+        if (!knowledgeButtons.getAttribute('style').match(/display:\s*none/)) {
             knowledgeButtons.setAttribute('style', 'display: none;');
         }
     }
-    initializeListener(mydiv, 'click', clickedMyHand, { override: true });
+    
+    initializeListener(mydiv, 'click', clickedMyHand);
+    if (currPlayerId == myId) {
+        message = "Its your turn baby!";
+        displayMessage(messageDiv, message);
+    }
 
     //set up the discard and the tableau
     var discard = document.querySelector("#discard");
@@ -247,7 +267,7 @@ function updateScreen(game, others, me, socket, currPlayerId, myId) {
         myHandInstruction(game, target, instructionType, cardIndex, me, socket, myHandButtons);
     }
 
-    initializeListener(myHandButtons, 'click', myHandClick, { override: true })
+    initializeListener(myHandButtons, 'click', myHandClick)
 }
 
 function setupTableau(game, discardArea, playfieldArea) {
@@ -265,7 +285,7 @@ function setupTableau(game, discardArea, playfieldArea) {
     discardArea.innerHTML = s;
 
     // set up the playfield
-    var s = "<ul>";
+    var s = "<ul>"//;
     for (i in game.tableau) {
         var stack = game.tableau[i];
         s += "<li><ul class='card-stack'>";
