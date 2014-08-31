@@ -60,7 +60,7 @@ function makeElementEditable(elm, callback){
 
     function changeTextValue(val) {
         textElm.setAttribute('style', '');
-        textbox.setAttribute('style', 'display: e');
+        textbox.setAttribute('style', 'display: none;');
         textbox.classList.remove('editing');
         if (val.length > 0) {
             textElm.textContent = val;
@@ -76,7 +76,7 @@ function makeElementEditable(elm, callback){
         // pressed escape
         if (e.keyCode == 27) {
             textElm.setAttribute('style', '');
-            textbox.setAttribute('style', 'display: none');
+            textbox.setAttribute('style', 'display: none;');
             textbox.classList.remove('editing');
         }
     });
@@ -94,7 +94,7 @@ function makeElementEditable(elm, callback){
         textbox.setAttribute('style', '');
         textbox.focus();
         textbox.setSelectionRange(0,textbox.value.length);
-        textElm.setAttribute('style', 'display: none')
+        textElm.setAttribute('style', 'display: none;')
     });
 }
 
