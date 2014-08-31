@@ -217,6 +217,7 @@
 		.instruction {
 			position: absolute;
 			bottom: 0px;
+			left: 0px;
 			width: 100%;
 			display: flex;
 			flex-flow: row;
@@ -247,9 +248,21 @@
 		.hand {
 			margin: auto;
 			position: relative;
+			padding: .5em;
 		}
 		.hand.current-player {
-			background: yellow;
+			background: #d5d3bb;
+			border-radius: 5px;
+			box-shadow: 0 0 10px #ffe400;
+			animation: pulse 1.5s linear alternate none infinite;
+		}
+		@keyframes pulse {
+			0% {
+				box-shadow: 0 0 10px #ffe400;
+			}
+			100% {
+				box-shadow: 0 0 15px #ffa100;
+			}
 		}
 		#messages {
 			padding: .5em 1em;
