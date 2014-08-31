@@ -221,6 +221,7 @@
 			width: 100%;
 			display: flex;
 			flex-flow: row;
+                        z-index: 1000;
 		}
 		.instruction li {
 			flex: 1 0 0px;
@@ -286,6 +287,10 @@
 			left: 50%;
 			cursor: pointer;
 		}
+                .de-emphasize {
+			opacity: .4;
+                        border: 1px solid white;
+                }
 </style>
 
 </head>
@@ -352,7 +357,7 @@
 		</div>
 		<div id="my-hand" class="hand">
 			<ul class="instruction">
-				<li x-button='discard-card'>Discard Card</li>
+				<li x-button='discard-card'>Discard</li>
 				<li x-button='play-card'>Play Card</li>
 				<li x-button='cancel'>Cancel</li>
 			</ul>

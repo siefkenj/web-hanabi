@@ -29,6 +29,10 @@ function extend(a, b) {
     }
 }
 
+function capitalize(w) {
+    return w.charAt(0).toUpperCase() + w.slice(1);
+}
+
 // take an object a and give it a key for
 // every item in arr and set the corresponding key to
 // true
@@ -77,11 +81,11 @@ function endGame(messageDiv, game) {
         messageDiv.setAttribute('style', '');
         messageDiv.addEventListener('click', function (e) {
             lobbyUrl += window.location.search
-            document.location.href = lobbyUrl;                     
+            document.location.href = lobbyUrl;
         });
 }
 
-// records a move in the game log, also sets the game log to the move that is being logged. 
+// records a move in the game log, also sets the game log to the move that is being logged.
 function logMove (game, name, instruction, numberColor, isPlayed, other) {
     if (other) {
         var s = name + " told " + other + " about their " + numberColor + "'s";
@@ -90,7 +94,7 @@ function logMove (game, name, instruction, numberColor, isPlayed, other) {
         if (type == "discard") {
             var s = name + ' ' + type + "ed a " + numberColor;
         } else {
-            s = name + " tried to play a " + numberColor + " and was " 
+            s = name + " tried to play a " + numberColor + " and was "
             s += isPlayed ? "" : "not ";
             s += "successful";
         }
@@ -122,6 +126,7 @@ function updateScreen(game, others, me, socket, currPlayerId, myId) {
     messageDiv.innerHTML == '';
 
     // hide the buttons, the first one found will be the instructions to move around
+    // XXX Fix this, this relys on the other's instruction being before #my-hand .instructions
     var knowledgeButtons = document.querySelector('.instruction');
     knowledgeButtons.setAttribute('style', 'display: none;');
     // setup all other player's hands
@@ -156,7 +161,7 @@ function updateScreen(game, others, me, socket, currPlayerId, myId) {
         return;
     }
 
-    //end the game after one more round if there are no more cards in the deck 
+    //end the game after one more round if there are no more cards in the deck
     // if the finalRound is not defined and there are no more cards set the final round
     if (!game.finalRound && game.deck.length == 0) {
         game.finishingPlayer = game.currentPlayer;
@@ -164,10 +169,11 @@ function updateScreen(game, others, me, socket, currPlayerId, myId) {
         var message = "This is the final Round, only one turn left";
         displayMessage(messageDiv, message);
     }
-        
+
     // click listener for others' hands.  This pops up the
     // menu where you can choose what information to give
     var clickedOnOther = function (e) {
+        reEmphasizeAllCards();
         if (currPlayerId != myId) {
             return;
         }
@@ -178,12 +184,17 @@ function updateScreen(game, others, me, socket, currPlayerId, myId) {
             var cardColor = others[playerNumber].hand[cardIndex].color;
             var cardNumber = others[playerNumber].hand[cardIndex].number;
 
-            // show the buttons
             e.currentTarget.appendChild(knowledgeButtons);
-            knowledgeButtons.setAttribute('style', '');
             knowledgeButtons.setAttribute('x-color', cardColor);
             knowledgeButtons.setAttribute('x-number', cardNumber);
             knowledgeButtons.setAttribute('x-player-number', playerNumber);
+
+            // set the button text
+            knowledgeButtons.querySelector('[x-button="tell-number"]').textContent = "Tell " + cardNumber;
+            knowledgeButtons.querySelector('[x-button="tell-color"]').textContent = "Tell " + capitalize(cardColor);
+
+            // show the buttons
+            knowledgeButtons.setAttribute('style', '');
         }
         // check to see if the buttons are hidden
         if (!myHandButtons.getAttribute('style').match(/display:\s*none/)) {
@@ -218,13 +229,45 @@ function updateScreen(game, others, me, socket, currPlayerId, myId) {
                 }
                 game.clueTokens--;
                 setKnowledge(others[playerNumber].hand, instruction);
-                logMove(game, me.name, instructionType, instruction, null, others[playerNumber].name); 
+                logMove(game, me.name, instructionType, instruction, null, others[playerNumber].name);
                 game.currentPlayer++;
                 socket.emit('game-update', game);
                 break;
         }
-    }
+    };
     initializeListener(knowledgeButtons, 'click', instructionClick);
+    var instructionButtonEnter = function (e) {
+        var target = e.currentTarget;
+        var playerNumber = knowledgeButtons.getAttribute('x-player-number');
+        var parent = document.querySelector('#hand' + playerNumber);
+        var cards = parent.querySelectorAll('.card');
+        switch (target.getAttribute('x-button')) {
+            case 'tell-number':
+                for (var i = 0; i < cards.length; i++) {
+                    var card  = cards[i];
+                    if (others[playerNumber].hand[card.getAttribute('x-card-index')].number == knowledgeButtons.getAttribute('x-number')) {
+                        card.classList.remove('de-emphasize');
+                    } else {
+                        card.classList.add('de-emphasize');
+                    }
+                }
+                break;
+            case 'tell-color':
+                for (var i = 0; i < cards.length; i++) {
+                    var card  = cards[i];
+                    if (others[playerNumber].hand[card.getAttribute('x-card-index')].color == knowledgeButtons.getAttribute('x-color')) {
+                        card.classList.remove('de-emphasize');
+                    } else {
+                        card.classList.add('de-emphasize');
+                    }
+                }
+                break;
+        }
+    };
+    initializeListener(knowledgeButtons.querySelector('[x-button="tell-number"]'), 'mouseover', instructionButtonEnter);
+    initializeListener(knowledgeButtons.querySelector('[x-button="tell-number"]'), 'mouseout', reEmphasizeAllCards);
+    initializeListener(knowledgeButtons.querySelector('[x-button="tell-color"]'), 'mouseover', instructionButtonEnter);
+    initializeListener(knowledgeButtons.querySelector('[x-button="tell-color"]'), 'mouseout', reEmphasizeAllCards);
 
     //look for my hand buttons and hide them
     var myHandButtons = document.querySelector('#my-hand .instruction');
@@ -236,18 +279,29 @@ function updateScreen(game, others, me, socket, currPlayerId, myId) {
         if (currPlayerId != myId) {
             return;
         }
-        if (e.originalTarget.className == "card") {
+        if (e.originalTarget.classList.contains("card")) {
             var target = e.originalTarget;
             var cardIndex = target.getAttribute('x-card-index');
             myHandButtons.setAttribute('style', '');
             myHandButtons.setAttribute('x-card-index', cardIndex);
+
+            // de-emphasize all the cards we didn't click on
+            var cards = e.currentTarget.querySelectorAll('.card');
+            for (var i = 0; i < cards.length; i++) {
+                var card = cards[i];
+                if (card.getAttribute('x-card-index') != cardIndex) {
+                    card.classList.add('de-emphasize');
+                } else {
+                    card.classList.remove('de-emphasize');
+                }
+            }
         }
-        // check to see if the buttons are hidden
+        // check to see if the other buttons are hidden
         if (!knowledgeButtons.getAttribute('style').match(/display:\s*none/)) {
             knowledgeButtons.setAttribute('style', 'display: none;');
         }
     }
-    
+
     initializeListener(mydiv, 'click', clickedMyHand);
     if (currPlayerId == myId) {
         message = "Its your turn baby!";
@@ -306,11 +360,19 @@ function setupTableau(game, discardArea, playfieldArea) {
 function isCardPlayable(game, card) {
     // checks if the length is undefined, if it is use 0 as the length.
     var length = game.tableau[card.color] ? game.tableau[card.color].length : 0;
-    // if the card number is the length +1 then it is the right card to play otherwise it is invalid 
+    // if the card number is the length +1 then it is the right card to play otherwise it is invalid
     if (card.number == length + 1) {
         return true;
     } else {
         return false;
+    }
+}
+
+function reEmphasizeAllCards() {
+    var cards = document.querySelectorAll('.card');
+    for (var i = 0; i < cards.length; i++) {
+        var card = cards[i];
+        card.classList.remove('de-emphasize');
     }
 }
 
@@ -319,6 +381,7 @@ function myHandInstruction(game, target, instructionType, cardIndex, me, socket,
     switch (instructionType) {
         case "cancel":
             myHandButtons.setAttribute('style', 'display: none;');
+            reEmphasizeAllCards();
             return;
         case "play-card":
             var playedCard = me.hand.splice(cardIndex, 1)[0];
@@ -343,6 +406,7 @@ function myHandInstruction(game, target, instructionType, cardIndex, me, socket,
             game.discard.push(playedCard);
             break;
     }
+    reEmphasizeAllCards();
     // add a new card to your hand if its not the end of game
     if (!game.finalRound) {
         me.hand.push(game.deck.pop());
