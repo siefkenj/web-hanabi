@@ -2,6 +2,7 @@
 <html>
 <head>
 	<script src="/js/socket.io.js"></script>
+	<script src="/js/classList.js"></script>
 	<script src="/js/game_init.js"></script>
 	<script src="/js/gameplay2.js"></script>
 
@@ -18,6 +19,8 @@
 			flex-flow: column nowrap;
 			display: flex;
 			font-family: sans-serif;
+			background: url("/images/blue-background.jpg");
+			color: #BCC2DD;
 		}
 
 		#play-field ul {
@@ -41,13 +44,6 @@
 			margin-left: 0px;
 		}
 
-		#hand12 {
-			display: flex;
-			flex-flow: row nowrap;
-			padding: 0px;
-			margin: 0px;
-			flex: 0 0 auto;
-		}
 		.card {
 			width: 73px;
 			height: 110px;
@@ -60,11 +56,6 @@
 		}
 		.card-list .card:hover {
 			box-shadow: 0px 0px 15px yellow;
-		}
-		#tableau {
-			display: flex;
-			flex-flow: row nowrap;
-			flex: 1 0 auto;
 		}
 		#play-field {
 			display: flex;
@@ -82,13 +73,6 @@
 		}
 		#discard li {
 			display: inline-block;
-		}
-		#hand345 {
-			display: flex;
-			flex-flow: row nowrap;
-			padding: 0px;
-			margin: 0px;
-			flex: 0 0 auto;
 		}
 		#clues-hearts-deck {
 			display: flex;
@@ -120,12 +104,12 @@
 			background-image: url('../images/deck.png');
 			text-shadow: 0 0 4px #ffe6a2;
 		}
-		.hand-contents ul {
+		.hand ul {
 			list-style: none;
 			margin: 0px;
 			padding: 0px;
 		}
-		.hand-contents li {
+		.hand li {
 			display: inline-block;
 		}
 		li:first-child .knowledge:before {
@@ -221,7 +205,7 @@
 			width: 100%;
 			display: flex;
 			flex-flow: row;
-                        z-index: 1000;
+			z-index: 1000;
 		}
 		.instruction li {
 			flex: 1 0 0px;
@@ -254,15 +238,16 @@
 		.hand.current-player {
 			background: #d5d3bb;
 			border-radius: 5px;
+			color: black;
 			box-shadow: 0 0 10px #ffe400;
-			animation: pulse 1.5s linear alternate none infinite;
+			animation: pulse 1s ease-in alternate none infinite;
 		}
 		@keyframes pulse {
 			0% {
 				box-shadow: 0 0 10px #ffe400;
 			}
 			100% {
-				box-shadow: 0 0 15px #ffa100;
+				box-shadow: 0 0 3px #ffa100;
 			}
 		}
 		#messages {
@@ -287,105 +272,121 @@
 			left: 50%;
 			cursor: pointer;
 		}
-                .de-emphasize {
+		.de-emphasize {
 			opacity: .4;
-                        border: 1px solid white;
-                }
+			border: 1px solid white;
+		}
+
+		body {
+		    display: flex;
+		    flex-flow: row wrap;
+		}
+		.hand {
+			flex: 1 0 auto;
+			text-align: center;
+		}
+		#clues-hearts-deck {
+		    order: 2;
+		    flex: 1 0 10%;
+		}
+		#play-field {
+		    flex: 1 0 45%;
+		    order: 3;
+		}
+		#discard {
+		    flex: 1 0 45%;
+		    order: 4
+		}
+		#hand0 {
+		    flex: 1 0 46%;
+		    order: 0;
+		}
+		#hand1 {
+		    flex: 1 0 46%;
+		    order: 1;
+		}
+		#hand2 {
+		    order: 5;
+			
+		}
+		#hand3 {
+		    order: 7;
+		}
+		#my-hand {
+		    order: 6;
+		}
+
+		@media all and (max-width: 800px) {
+		    #clues-hearts-deck {
+			order: 0;
+			flex: 1 0 100%;
+			flex-flow: row;
+		    }
+		    #play-field {
+			flex: 1 0 100%;
+			order: 6;
+		    }
+		    #discard {
+			flex: 1 0 100%;
+			order: 7
+		    }
+		    #hand0 {
+			flex: 1 0 46%;
+			order: 1;
+		    }
+		    #hand1 {
+			flex: 1 0 46%;
+			order: 2;
+		    }
+		    #hand2 {
+			order: 3;
+		    }
+		    #hand3 {
+			order: 4;
+		    }
+		    #my-hand {
+			order: 5;
+		    }
+		}
 </style>
 
 </head>
 	<div id="messages"><p>Ths is</p></div>
 <body>
-   	<div id="hand12" class="hand-contents">
-		<div id="hand0" class="hand">
-			<ul class="card-list">
-			</ul>
-		</div>
-
-		<div id="hand1" class="hand">
-			<ul class="card-list">
-				<li>
-					<div class="knowledge maybe-four maybe-green maybe-blue  maybe-two maybe-yellow maybe-black">
-						<span class="color">■</span><span class="color">■</span><span class="color">■</span><span class="color">■</span><span class="color">■</span>
-						<span class="number">1</span><span class="number">2</span><span class="number">3</span><span class="number">4</span><span class="number">5</span>
-					</div>
-					<img class="card" src="/images/cards/3-blue.png">
-				</li>
-				<li>
-					<div class="knowledge maybe-red maybe-green maybe-blue  maybe-two maybe-yellow maybe-black">
-						<span class="color">■</span><span class="color">■</span><span class="color">■</span><span class="color">■</span><span class="color">■</span>
-						<span class="number">1</span><span class="number">2</span><span class="number">3</span><span class="number">4</span><span class="number">5</span>
-					</div>
-					<img class="card" src="/images/cards/2-green.png">
-				</li>
-				<li>
-					<img class="card" src="/images/cards/3-blue.png">
-				</li>
-				<li>
-					<img class="card" src="/images/cards/2-green.png">
-				</li>
-				<li>
-					<img class="card" src="/images/cards/3-black.png">
-				</li>
-			</ul>
-		</div>
+	<div id="clues-hearts-deck">
+		<div id="clue-display">8</div>
+		<div id="hearts-display">3</div>
+		<div id="deck-display"></div>
+	</div>
+	<div id="hand0" class="hand">
+		<ul class="instruction">
+			<li x-button='tell-color'>Tell Color</li>
+			<li x-button='tell-number'>Tell Number</li>
+			<li x-button='cancel'>Cancel</li>
+		</ul>
+		<ul class="card-list"></ul>
 	</div>
 
-	<div id="tableau">
-		<div id="clues-hearts-deck">
-			<div id="clue-display">8</div>
-			<div id="hearts-display">3</div>
-			<div id="deck-display"></div>
-		</div>
-		<div id="play-field">playField</div>
-		<div id="discard">discard</div>
+	<div id="hand1" class="hand">
+		<ul class="card-list"></ul>
 	</div>
-	<div id="hand345" class="hand-contents">
-		<div id="hand2" class="hand">
-			<ul class="instruction">
-				<li x-button='tell-color'>Tell Color</li>
-				<li x-button='tell-number'>Tell Number</li>
-				<li x-button='cancel'>Cancel</li>
-			</ul>
-			<ul class="card-list">
-				<img class="card">
-				<img class="card" src="/images/cards/2-green.png">
-				<img class="card" src="/images/cards/3-blue.png">
-				<img class="card" src="/images/cards/2-green.png">
-				<img class="card" src="/images/cards/3-black.png">
-			</ul>
-		</div>
-		<div id="my-hand" class="hand">
-			<ul class="instruction">
-				<li x-button='discard-card'>Discard</li>
-				<li x-button='play-card'>Play Card</li>
-				<li x-button='cancel'>Cancel</li>
-			</ul>
-			<ul class="card-list">
-				<li>
-					<img class="card" src="/images/cards/3-blue.png">
-				</li>
-				<li>
-					<img class="card" src="/images/cards/2-green.png">
-				</li>
-				<img class="card" src="/images/cards/3-blue.png">
-				<li>
-					<img class="card" src="/images/cards/2-green.png">
-				</li>
-				<li>
-					<img class="card" src="/images/cards/3-black.png">
-				</li>
-			</ul>
-		</div>
-		<div id="hand3" class="hand">
-			<ul class="card-list">
-				<img class="card" src="/images/cards/3-blue.png">
-				<img class="card" src="/images/cards/2-green.png">
-				<img class="card" src="/images/cards/3-blue.png">
-				<img class="card" src="/images/cards/2-green.png">
-				<img class="card" src="/images/cards/3-black.png">
-			</ul>
-		</div>
+	<div id="hand2" class="hand">
+		<ul class="card-list"></ul>
 	</div>
+	<div id="hand3" class="hand">
+		<ul class="card-list"></ul>
+	</div>
+	<div id="my-hand" class="hand">
+		<ul class="instruction">
+			<li x-button='discard-card'>Discard</li>
+			<li x-button='play-card'>Play Card</li>
+			<li x-button='cancel'>Cancel</li>
+		</ul>
+		<ul class="card-list">
+		</ul>
+	</div>
+	
+	<div id="play-field">playField</div>
+	<div id="discard">discard</div>
 </body>
 </html>
