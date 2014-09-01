@@ -177,8 +177,8 @@ function updateScreen(game, others, me, socket, currPlayerId, myId) {
         if (currPlayerId != myId) {
             return;
         }
-        if (e.originalTarget.className == "card") {
-            var target = e.originalTarget;
+        var target = e.target;
+        if (target.classList.contains("card")) {
             var playerNumber = target.getAttribute('x-player-number');
             var cardIndex = target.getAttribute('x-card-index');
             var cardColor = others[playerNumber].hand[cardIndex].color;
@@ -211,7 +211,7 @@ function updateScreen(game, others, me, socket, currPlayerId, myId) {
     // setup the instruction clicks for the information menu.
     var instructionClick = function (e) {
         var target = e.currentTarget;
-        var instructionType = e.originalTarget.getAttribute('x-button');
+        var instructionType = e.target.getAttribute('x-button');
         var playerNumber = target.getAttribute('x-player-number');
         var instructionColor = target.getAttribute('x-color');
         var instructionNumber = target.getAttribute('x-number');
@@ -279,8 +279,8 @@ function updateScreen(game, others, me, socket, currPlayerId, myId) {
         if (currPlayerId != myId) {
             return;
         }
-        if (e.originalTarget.classList.contains("card")) {
-            var target = e.originalTarget;
+        var target = e.target;
+        if (target.classList.contains("card")) {
             var cardIndex = target.getAttribute('x-card-index');
             myHandButtons.setAttribute('style', '');
             myHandButtons.setAttribute('x-card-index', cardIndex);
@@ -316,7 +316,7 @@ function updateScreen(game, others, me, socket, currPlayerId, myId) {
 
     var myHandClick = function (e) {
         var target = e.currentTarget;
-        var instructionType = e.originalTarget.getAttribute('x-button');
+        var instructionType = e.target.getAttribute('x-button');
         var cardIndex = target.getAttribute('x-card-index');
         myHandInstruction(game, target, instructionType, cardIndex, me, socket, myHandButtons);
     }
