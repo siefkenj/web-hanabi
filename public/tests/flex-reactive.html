@@ -1,0 +1,312 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Play Screen</title>
+	<style>
+		html {
+			height: 100%;
+		}
+		body {
+			height: 100%;
+			margin: 0px;
+			padding: 0px;
+			display: flex;
+			flex-flow: column nowrap;
+			font-family: sans-serif;
+			background: url("/images/grainy-light.png");
+			color: white;
+		}
+		body:after {
+			background-image: radial-gradient(circle closest-side at center center , rgba(0, 0, 0, 0) 70%, rgba(0, 0, 0, 0.4) 250%);
+			bottom: 0;
+			content: "";
+			left: 0;
+			pointer-events: none;
+			position: absolute;
+			right: 0;
+			top: 0;
+			z-index: -1;
+		}
+
+		#header {
+			background: #1a468c;
+			box-shadow: 0 0 5px #28d9f8;
+			color: #d3d3d3;
+			font-weight: bold;
+			padding: 2px 10px;
+		}
+		#footer {
+			background: #1a468c;
+			box-shadow: 0 0 5px #28d9f8;
+			color: #d3d3d3;
+			padding: 2px 10px;
+			font-style: italic;
+			font-size: .8em;
+		}
+
+		#clues-hearts-deck {
+			text-align: center;
+		}
+		#clues-hearts-deck .info-icon{
+			display: inline-block;
+		}
+		#clue-display, #hearts-display, #deck-display {
+			width: 60px;
+			height: 60px;
+			background-size: 100% 100%;
+			margin: auto;
+			text-align: center;
+			padding-top: 15px;
+			box-sizing: border-box;
+			font-size: 1.4em;
+			font-weight: bold;
+			color: white;
+		}
+		#clue-display {
+			background-image: url('../images/clues.png');
+			text-shadow: 0 0 4px #00ff21;
+		}
+		#hearts-display {
+			background-image: url('../images/heart.svg');
+			text-shadow: 0 0 4px #ffa4ce;
+		}
+		#deck-display {
+			background-image: url('../images/deck.png');
+			text-shadow: 0 0 4px #ffe6a2;
+			text-align: left;
+			padding-left: 10px;
+		}
+
+		#play-field h2, #discard h2 {
+			background: #1a468c;
+			padding: 0px 10px;
+			margin: 0px;
+			font-size: .9em;
+			font-style: italic;
+		}
+		#play-field, #discard {
+			margin-right: 10px;
+		}
+		#play-field .contents, #discard .contents {
+			background: rgba(179, 173, 150, 0.74);
+			border-radius: 0 0 10px 10px;
+		}
+
+		#log {
+			overflow: scroll;
+			background: rgba(179, 173, 150, 0.74);
+			border-radius: 10px 10px 0 0;
+		}
+		#log ul {
+			max-height: 30%;
+			list-style: none;
+			margin: 10px;
+			padding: 0px;
+		}
+
+		.hand {
+			margin: 0px;
+			margin: 5px;
+			padding-left: 90px;
+			position: relative;
+		}
+		.hand .player-name {
+			width: 90px;
+			margin-left: -90px;
+			padding: 0px;
+			box-sizing: border-box;
+			position: absolute;
+			text-align: center;
+			font-size: .8em;
+			font-style: italic;
+		}
+		.hand.current-player {
+			background: #d5d3bb;
+			border-radius: 5px;
+			color: black;
+			box-shadow: 0 0 10px #ffe400;
+			animation: pulse 1s ease-in alternate none infinite;
+		}
+		@keyframes pulse {
+			0% {
+				box-shadow: 0 0 10px #ffe400;
+			}
+			100% {
+				box-shadow: 0 0 3px #ffa100;
+			}
+		}
+
+
+		/* all the flex stuff goes here if we support it */
+		body {
+			display: flex;
+			flex-flow: column nowrap;
+		}
+		body > div {
+			flex: 0 0 auto;
+		}
+		#body {
+			display: flex;
+			flex-flow: row wrap;
+			flex: 1 0 auto;
+		}
+		#clues-hearts-deck {
+			display: flex;
+			flex-flow: column nowrap;
+		}
+		.clear-flex {
+			flex: 0 0 100%;
+			height: 0px;
+			order: 99;
+		}
+		.hand {
+			flex: 1 0 auto;
+		}
+
+		/* order everything */
+		#hand0 { order: 0; }
+		#hand1 { order: 1; }
+		#clear-flex1 { order: 2; }
+		#clues-hearts-deck { order: 3; }
+		#play-field { order: 4; flex: 1 0 0px;}
+		#discard { order: 5; flex: 1 0 0px;}
+		#clear-flex2 { order: 6; }
+		#hand2 { order: 7; }
+		#my-hand { order: 8; }
+		#hand3 { order: 9; }
+		#log { order: 10; flex: 0 0 auto; }
+
+		
+		
+		@media all and (max-width: 800px) {
+			/* order everything */
+			#clues-hearts-deck { order: 0; flex-flow: row; flex: 1 0 100%;}
+			#hand0 { order: 1; }
+			#hand1 { order: 2; }
+			#hand2 { order: 3; }
+			#hand3 { order: 4; }
+			#my-hand { order: 5; }
+			#play-field { order: 6; flex: 1 0 100%;}
+			#discard { order: 7; flex: 1 0 100%;}
+			#clear-flex1, #clear-flex2 { order: 99; display: none;}
+
+			.hand {
+				padding-left: 0px;
+				padding-top: 10px;
+				position: relative;
+			}
+			.hand .player-name {
+				width: 90px;
+				margin-top: -10px;
+				margin-left: 0px;
+				left: 0px;
+				text-align: left;
+			}
+			
+			#clue-display, #hearts-display, #deck-display {
+				width: 30px;
+				height: 30px;
+				padding-top: 5px;
+				font-size: 1em;
+			}
+			#deck-display {
+				padding-left: 3px;
+			}
+
+		}
+	</style>
+
+</head>
+<body>
+	<div id="header">header</div>
+	<div id="body">
+		<div id="clues-hearts-deck">
+			<div id="clue-display" class="info-icon">8</div>
+			<div id="hearts-display" class="info-icon">3</div>
+			<div id="deck-display" class="info-icon">30</div>
+		</div>
+		<div id="hand0" class="hand">
+			<div class="player-name">Ronald0</div>
+			<div class="contents">
+				<ul class="card-list"></ul>
+				this is the hand contents!
+			</div>
+		</div>
+		<div id="hand1" class="hand current-player">
+			<div class="player-name">Tom1</div>
+			<div class="contents">
+				<ul class="card-list"></ul>
+				this is the hand contents!
+			</div>
+		</div>
+		<div id="hand2" class="hand">
+			<div class="player-name">Butter2</div>
+			<div class="contents">
+				<ul class="card-list"></ul>
+				this is the hand contents!
+			</div>
+		</div>
+		<div id="hand3" class="hand">
+			<div class="player-name">Fartsy3</div>
+			<div class="contents">
+				<ul class="card-list"></ul>
+				this is the hand contents!
+			</div>
+		</div>
+		<div id="my-hand" class="hand">
+			<div class="player-name">Me</div>
+			<!-- <ul class="instruction">
+				<li x-button='discard-card'>Discard</li>
+				<li x-button='play-card'>Play Card</li>
+				<li x-button='cancel'>Cancel</li>
+			</ul> -->
+			<div class="contents">
+				<ul class="card-list"></ul>
+				this is the hand contents!
+			</div>
+		</div>
+
+		<div id="play-field">
+			<h2>Played Cards</h2>
+			<div class="contents">
+				this is the contents!
+				<br>
+				this is the contents!
+				<br>
+				this is the contents!
+				<br>
+			</div>
+		</div>
+		<div id="discard">
+			<h2>Discarded Cards</h2>
+			<div class="contents">
+				this is the contents!
+			</div>
+		</div>
+		<div id="log">
+			<ul>
+				<li>move that happened 1</li>
+				<li>move that happened 2</li>
+				<li>move that happened 3</li>
+				<li>move that happened 4</li>
+				<li>move that happened 4</li>
+				<li>move that happened 4</li>
+				<li>move that happened 4</li>
+				<li>move that happened 4</li>
+				<li>move that happened 4</li>
+				<li>move that happened 4</li>
+				<li>move that happened 4</li>
+				<li>move that happened 4</li>
+				<li>move that happened 4</li>
+				<li>move that happened 4</li>
+				<li>move that happened 4</li>
+			</ul>
+		</div>
+		<div id="clear-flex1" class="clear-flex"></div>
+		<div id="clear-flex2" class="clear-flex"></div>
+
+	</div>
+	<div id="footer">footer</div>
+</body>
+</html>
