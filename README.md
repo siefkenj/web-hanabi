@@ -33,7 +33,7 @@ statically.
 How to play
 -----------
 
-The rules of the game can be found in the PDF called `The Rules.pdf` - link here https://github.com/siefkenj/web-hanabi/blob/master/The%20Rules.pdf
+The rules of the game can be found in the PDF called [The Rules.pdf](/The Rules.pdf) - [link here](https://www.villagehome.org/blog/attachment/index.php/4923/1/regle_en_hanabi.pdf)
 
 Be sure to understand the rules before continuing!
 
