@@ -45,8 +45,8 @@
 		}
 
 		.card {
-			width: 73px;
-			height: 110px;
+			width: 4.6em;
+			height: 7em;
 			background: white;
 			margin: 2px;
 			border-radius: 10px;
@@ -81,12 +81,12 @@
 			flex: 0 0 auto;
 		}
 		#clue-display, #hearts-display, #deck-display {
-			width: 100px;
-			height: 100px;
+			width: 4em;
+			height: 4em;
 			background-size: 100% 100%;
 			margin: auto;
 			text-align: center;
-			padding-top: 40px;
+			padding-top: 1.7em;
 			box-sizing: border-box;
 			font-size: 1.4em;
 			font-weight: bold;
@@ -317,34 +317,41 @@
 		}
 
 		@media all and (max-width: 800px) {
+                    body {
+                        flex-flow: column wrap;
+                    }
 		    #clues-hearts-deck {
+                        flex: 1 0 70px;
 			order: 0;
-			flex: 1 0 100%;
 			flex-flow: row;
+                        font-size: 75%;
 		    }
 		    #play-field {
-			flex: 1 0 100%;
+                        flex: 1 0 130px;
 			order: 6;
 		    }
 		    #discard {
-			flex: 1 0 100%;
+                        flex: 1 0 130px;
 			order: 7
 		    }
 		    #hand0 {
-			flex: 1 0 46%;
+                        flex: 1 0 130px;
 			order: 1;
 		    }
 		    #hand1 {
-			flex: 1 0 46%;
+                        flex: 1 0 130px;
 			order: 2;
 		    }
 		    #hand2 {
+                        flex: 1 0 130px;
 			order: 3;
 		    }
 		    #hand3 {
+                        flex: 1 0 130px;
 			order: 4;
 		    }
 		    #my-hand {
+                        flex: 1 0 130px;
 			order: 5;
 		    }
 		}
