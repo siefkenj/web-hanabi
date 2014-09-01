@@ -29,3 +29,12 @@ statically.
 	 If you want to see syncronization between different
 	 computers, navigate a browser on another computer
 	 to `<your IP>:3000/tests/websockets_test.html`
+
+How to play
+-----------
+
+The rules of the game can be found in the PDF called `The Rules.pdf` - link here https://github.com/siefkenj/web-hanabi/blob/master/The%20Rules.pdf
+
+Be sure to understand the rules before continuing!
+
+Once you have confirmed installation of Node and confirmed your server is working, Navigate to `localhost:3000/tests/lobby.html` and instruct the other players to go to `<your IP>:3000/tests/lobby.html`once you have the required number of players click on `I'm Ready!` to begin the game.
