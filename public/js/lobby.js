@@ -1,7 +1,7 @@
 "use strict";
 
 //used for testing everyone ready behaviour.
-var pageRedirect = "/tests/play_third.html";
+var pageRedirect = "/tests/flex-reactive.html";
 
 function parseUriSearchString (str) {
     // Remove leading questionmark

@@ -2,6 +2,11 @@
 <!DOCTYPE html>
 <html>
 <head>
+	<script src="/js/socket.io.js"></script>
+	<script src="/js/classList.js"></script>
+	<script src="/js/game_init.js"></script>
+	<script src="/js/gameplay2.js"></script>
+
 	<title>Play Screen</title>
 	<style>
 		html {
@@ -78,17 +83,17 @@
 			padding-left: 10px;
 		}
 
-		#play-field h2, #discard h2 {
+		#tableau h2, #discard h2 {
 			background: #1a468c;
 			padding: 0px 10px;
 			margin: 0px;
 			font-size: .9em;
 			font-style: italic;
 		}
-		#play-field, #discard {
+		#tableau, #discard {
 			margin-right: 10px;
 		}
-		#play-field .contents, #discard .contents {
+		#tableau .contents, #discard .contents {
 			background: rgba(179, 173, 150, 0.74);
 			border-radius: 0 0 10px 10px;
 		}
@@ -137,7 +142,6 @@
 			}
 		}
 
-
 		/* all the flex stuff goes here if we support it */
 		body {
 			display: flex;
@@ -163,13 +167,197 @@
 		.hand {
 			flex: 1 0 auto;
 		}
+		
+		
+		#tableau ul {
+			list-style: none;
+			margin: 0px;
+			padding: 0px;
+		}
+		#tableau ul li {
+			display: inline-block;
+		}
+		.card-stack li {
+			margin-left: -55px;
+		}
+		.card-stack li:first-child {
+			margin-left: 0px;
+		}
+		#discard li {
+			margin-right: -55px;
+		}
+		#discard ul {
+			list-style: none;
+			margin: 0px;
+			padding: 0px;
+		}
+		#discard li {
+			display: inline-block;
+		}
+
+		#log {
+			font-weight: lighter;
+		}
+		.yellow { color: yellow; }
+		.green { color: green; }
+		.red { color: red; }
+		.black { color: black; }
+		.blue { color: blue; }
+		i { font-style: italic; }
+
+
+
+		/* stuff for the card display */
+		.de-emphasize {
+			opacity: .4;
+			border: 1px solid white;
+		}
+		.card {
+			width: 4.6em;
+			height: 7em;
+			background: white;
+			margin: 2px;
+			border-radius: 10px;
+			border: 1px solid #555;
+			transition: box-shadow .2s;
+			cursor: pointer;
+		}
+		.card-list .card:hover {
+			box-shadow: 0px 0px 15px yellow;
+		}
+		.hand ul {
+			list-style: none;
+			margin: 0px;
+			padding: 0px;
+		}
+		.hand li {
+			display: inline-block;
+		}
+		li:first-child .knowledge:before {
+			font-size: .7em;
+			position: absolute;
+			font-style: italic;
+			top: -1em;
+		}
+		.knowledge {
+			width: 5em;
+			height: 2.2em;
+			display: block;
+			position: relative;
+		}
+		.knowledge .color,
+		.knowledge .number {
+			display: none;
+		}
+		.maybe-red .color:nth-child(1) {
+			position: absolute;
+			color: red;
+			left: 0em;
+			bottom: 0em;
+			display: block;
+		}
+		.maybe-green .color:nth-child(2) {
+			position: absolute;
+			color: green;
+			left: 1em;
+			bottom: 0em;
+			display: block;
+		}
+		.maybe-yellow .color:nth-child(3) {
+			position: absolute;
+			color: yellow;
+			left: 2em;
+			bottom: 0em;
+			display: block;
+		}
+		.maybe-blue .color:nth-child(4) {
+			position: absolute;
+			color: blue;
+			left: 3em;
+			bottom: 0em;
+			display: block;
+		}
+		.maybe-black .color:nth-child(5) {
+			position: absolute;
+			color: black;
+			left: 4em;
+			bottom: 0em;
+			display: block;
+		}
+		.maybe-1 .number:nth-child(6) {
+			position: absolute;
+			number: red;
+			left: 0em;
+			bottom: 1em;
+			display: block;
+		}
+		.maybe-2 .number:nth-child(7) {
+			position: absolute;
+			number: green;
+			left: 1em;
+			bottom: 1em;
+			display: block;
+		}
+		.maybe-3 .number:nth-child(8) {
+			position: absolute;
+			number: yellow;
+			left: 2em;
+			bottom: 1em;
+			display: block;
+		}
+		.maybe-4 .number:nth-child(9) {
+			position: absolute;
+			number: blue;
+			left: 3em;
+			bottom: 1em;
+			display: block;
+		}
+		.maybe-5 .number:nth-child(10) {
+			position: absolute;
+			number: black;
+			left: 4em;
+			bottom: 1em;
+			display: block;
+		}
+		.instruction {
+			position: absolute;
+			bottom: 0px;
+			left: 0px;
+			width: 100%;
+			display: flex;
+			flex-flow: row;
+			z-index: 1000;
+		}
+		.instruction li {
+			flex: 1 0 0px;
+			background: rgb(28, 184, 65);
+			padding: .5em 1em;
+			margin: 3px;
+			border-radius: 5px;
+			text-align: center;
+			color: white;
+			text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+			cursor: pointer;
+			vertical-align: baseline;
+			box-sizing: border-box;
+			border: 1px solid white;
+		}
+		.instruction li:hover {
+			border: 1px solid green;
+		}
+		.instruction li[x-button="cancel"] {
+			background: rgb(202, 60, 60);
+		}
+		.instruction li[x-button="cancel"]:hover {
+			border: 1px solid red;
+		}
 
 		/* order everything */
 		#hand0 { order: 0; }
 		#hand1 { order: 1; }
 		#clear-flex1 { order: 2; }
 		#clues-hearts-deck { order: 3; }
-		#play-field { order: 4; flex: 1 0 0px;}
+		#tableau { order: 4; flex: 1 0 0px;}
 		#discard { order: 5; flex: 1 0 0px;}
 		#clear-flex2 { order: 6; }
 		#hand2 { order: 7; }
@@ -187,7 +375,7 @@
 			#hand2 { order: 3; }
 			#hand3 { order: 4; }
 			#my-hand { order: 5; }
-			#play-field { order: 6; flex: 1 0 100%;}
+			#tableau { order: 6; flex: 1 0 100%;}
 			#discard { order: 7; flex: 1 0 100%;}
 			#clear-flex1, #clear-flex2 { order: 99; display: none;}
 
@@ -227,47 +415,47 @@
 			<div id="deck-display" class="info-icon">30</div>
 		</div>
 		<div id="hand0" class="hand">
-			<div class="player-name">Ronald0</div>
+			<div class="player-name"></div>
 			<div class="contents">
+				<ul class="instruction">
+					<li x-button='tell-color'>Tell Color</li>
+					<li x-button='tell-number'>Tell Number</li>
+					<li x-button='cancel'>Cancel</li>
+				</ul>
 				<ul class="card-list"></ul>
-				this is the hand contents!
 			</div>
 		</div>
-		<div id="hand1" class="hand current-player">
-			<div class="player-name">Tom1</div>
+		<div id="hand1" class="hand">
+			<div class="player-name"></div>
 			<div class="contents">
 				<ul class="card-list"></ul>
-				this is the hand contents!
 			</div>
 		</div>
 		<div id="hand2" class="hand">
-			<div class="player-name">Butter2</div>
+			<div class="player-name"></div>
 			<div class="contents">
 				<ul class="card-list"></ul>
-				this is the hand contents!
 			</div>
 		</div>
 		<div id="hand3" class="hand">
-			<div class="player-name">Fartsy3</div>
+			<div class="player-name"></div>
 			<div class="contents">
 				<ul class="card-list"></ul>
-				this is the hand contents!
 			</div>
 		</div>
 		<div id="my-hand" class="hand">
 			<div class="player-name">Me</div>
-			<!-- <ul class="instruction">
+			<ul class="instruction">
 				<li x-button='discard-card'>Discard</li>
 				<li x-button='play-card'>Play Card</li>
 				<li x-button='cancel'>Cancel</li>
-			</ul> -->
+			</ul>
 			<div class="contents">
 				<ul class="card-list"></ul>
-				this is the hand contents!
 			</div>
 		</div>
 
-		<div id="play-field">
+		<div id="tableau">
 			<h2>Played Cards</h2>
 			<div class="contents">
 				this is the contents!
@@ -281,26 +469,10 @@
 		<div id="discard">
 			<h2>Discarded Cards</h2>
 			<div class="contents">
-				this is the contents!
 			</div>
 		</div>
 		<div id="log">
 			<ul>
-				<li>move that happened 1</li>
-				<li>move that happened 2</li>
-				<li>move that happened 3</li>
-				<li>move that happened 4</li>
-				<li>move that happened 4</li>
-				<li>move that happened 4</li>
-				<li>move that happened 4</li>
-				<li>move that happened 4</li>
-				<li>move that happened 4</li>
-				<li>move that happened 4</li>
-				<li>move that happened 4</li>
-				<li>move that happened 4</li>
-				<li>move that happened 4</li>
-				<li>move that happened 4</li>
-				<li>move that happened 4</li>
 			</ul>
 		</div>
 		<div id="clear-flex1" class="clear-flex"></div>
@@ -308,5 +480,6 @@
 
 	</div>
 	<div id="footer">footer</div>
+	<div id="messages"></div>
 </body>
 </html>

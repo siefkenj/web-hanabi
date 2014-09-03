@@ -88,14 +88,14 @@ function endGame(messageDiv, game) {
 // records a move in the game log, also sets the game log to the move that is being logged.
 function logMove (game, name, instruction, numberColor, isPlayed, other) {
     if (other) {
-        var s = name + " told " + other + " about their " + numberColor + "'s";
+        var s = name + " told <i>" + other + "</i> about their <span class='"+numberColor+"'>" + numberColor + "</span>'s";
     } else {
         var type = instruction == "discard-card" ? "discard" : "card";
         if (type == "discard") {
-            var s = name + ' ' + type + "ed a " + numberColor;
+            var s = name + ' ' + type + "ed a <span class='"+numberColor+"'>" + numberColor + "</span>";
         } else {
-            s = name + " tried to play a " + numberColor + " and was "
-            s += isPlayed ? "" : "not ";
+            s = name + " tried to play a <span class='"+numberColor+"'>" + numberColor + "</span> and was "
+            s += isPlayed ? "" : "<b>not</b> ";
             s += "successful";
         }
     }
@@ -105,6 +105,7 @@ function logMove (game, name, instruction, numberColor, isPlayed, other) {
 
 // places a message in the message div, displays it and sets up a click event to return to to game
 function displayMessage (messageDiv, message) {
+    return
     messageDiv.innerHTML = "<p>" + message + "</p>"
     messageDiv.setAttribute('style', '');
     messageDiv.addEventListener('click', function (e) {
@@ -138,6 +139,7 @@ function updateScreen(game, others, me, socket, currPlayerId, myId) {
             handDiv.classList.remove('current-player');
         }
         setupHand(others[i].hand, handDiv.querySelector('.card-list'), i);
+        handDiv.querySelector('.player-name').textContent = others[i].name;
     }
     // set up our own hand
     handDiv = document.querySelector("#my-hand")
@@ -147,13 +149,19 @@ function updateScreen(game, others, me, socket, currPlayerId, myId) {
         handDiv.classList.remove('current-player');
     }
     setupMyHand(me.hand, handDiv.querySelector('.card-list'), showCards, currPlayerId == myId);
+    handDiv.querySelector('.player-name').textContent = me.name;
 
-    //set up hearts
-    document.querySelector('#hearts-display').innerHTML = game.hearts;
-    // set up clues
-    document.querySelector('#clue-display').innerHTML = game.clueTokens;
-    // set up deck
-    document.querySelector('#deck-display').innerHTML = game.deck.length;
+    // setup hearts
+    document.querySelector('#hearts-display').textContent = game.hearts;
+    // setup clues
+    document.querySelector('#clue-display').textContent = game.clueTokens;
+    // setup deck
+    document.querySelector('#deck-display').textContent = game.deck.length;
+
+    // setup the log
+    var logUl = document.querySelector('#log ul');
+    logUl.innerHTML = "<li>" + game.gameLog.join('</li><li>') + "</li>";
+
 
     // end the game if there are no hearts or if this is the final round of play
     if (game.hearts == 0 || game.finishingPlayer - game.currentPlayer % game.players.length == 0) {
@@ -310,8 +318,8 @@ function updateScreen(game, others, me, socket, currPlayerId, myId) {
 
     //set up the discard and the tableau
     var discard = document.querySelector("#discard");
-    var playfield = document.querySelector("#play-field");
-    setupTableau(game, discard, playfield);
+    var tableau = document.querySelector("#tableau");
+    setupTableau(game, discard, tableau);
 
 
     var myHandClick = function (e) {
@@ -324,7 +332,7 @@ function updateScreen(game, others, me, socket, currPlayerId, myId) {
     initializeListener(myHandButtons, 'click', myHandClick)
 }
 
-function setupTableau(game, discardArea, playfieldArea) {
+function setupTableau(game, discardArea, tableauArea) {
     var i, j;
 
     // set up the discard area
@@ -336,9 +344,9 @@ function setupTableau(game, discardArea, playfieldArea) {
         s += "</li>";
     }
     s += "</ul>"
-    discardArea.innerHTML = s;
+    discardArea.querySelector('.contents').innerHTML = s;
 
-    // set up the playfield
+    // set up the tableau
     var s = "<ul>"//;
     for (i in game.tableau) {
         var stack = game.tableau[i];
@@ -352,7 +360,7 @@ function setupTableau(game, discardArea, playfieldArea) {
         s += "</ul></li>";
     }
     s += "</ul>"
-    playfieldArea.innerHTML = s;
+    tableauArea.querySelector('.contents').innerHTML = s;
 
 }
 
