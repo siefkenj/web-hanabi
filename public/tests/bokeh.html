@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<script src="/js/StackBlur.js"></script>
+	<script src="/js/bokeh.js"></script>
+	<title>Bokeh Effect</title>
+	<style>
+		html {
+			height: 100%;
+		}
+		body {
+			height: 100%;
+			margin: 0px;
+			padding: 0px;
+			background: purple;
+		}
+
+		#bokeh-container {
+			position: absolute;
+			left: 0px;
+			top: 0px;
+			overflow: hidden;
+			width: 100%;
+			height: 100%;
+			z-index: -1;
+		}
+	</style>
+	<script>
+		window.onload = function() {
+		    b = new Bokeh;
+		    b.initialize()
+		}
+	</script>
+
+</head>
+<body>
+</body>
+</html>
