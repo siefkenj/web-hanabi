@@ -35,7 +35,7 @@ function doBubbleBlend(e) {
 
                 stride = ypos*targetBuffer.width*4 + xpos*4;
                 strideBubble = j*bubble.width*4 + i*4;
-                
+
                 alpha = bubble.data[strideBubble + 3]/255;
                 // if there is nothing to blend, do nothing
                 if (alpha === 0) {
@@ -57,14 +57,14 @@ function doBubbleBlend(e) {
                 a = targetBuffer.data[stride + 3]/255;
                 b = bubble.data[strideBubble + 3]/255;
                 targetBuffer.data[stride + 3] = 255*(a + b - a*b);
-                
+
             }
         }
     }
     for (j = 0; j < targetBuffer.height; j++) {
         for (i = 0; i < targetBuffer.width; i++) {
             stride = j*targetBuffer.width*4 + i*4;
-            
+
             alpha = targetBuffer.data[stride + 3]/255;
             // if there is nothing to blend, do nothing
             if (alpha === 0) {
