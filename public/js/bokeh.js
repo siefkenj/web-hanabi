@@ -116,7 +116,8 @@ var Bokeh = (function () {
         // mask to lighten up the bubbles, then copy the bubbles using
         // destination-in into our final canvas.
 
-        var NUM_BUBBLES = 18, r = 20, thickness = 10, blurFactor = .5;
+        var _this = this;
+        var NUM_BUBBLES = 28, r = 20, thickness = 10, blurFactor = .5, targetBuffer, sourceBuffer, worker;
         var grad;
         var width = this.scratchCanvases[0].width;
         var height = this.scratchCanvases[0].height;
@@ -134,52 +135,59 @@ var Bokeh = (function () {
             ctx0.fillStyle = grad;
             ctx0.fillRect(0, 0, width, height);
         }
+        
         // draw random bubbles
-        function drawBubbles () {
-            var x, y, i, rad;
+        function drawBubble () {
+            var i, rad;
+            
+            rad = r*(1-Math.random()/3);
 
-            ctx1.clearRect(0, 0, width, height);
-            ctx1.globalCompositeOperation = 'screen';
+            ctx1.clearRect(0, 0, 2*rad, 2*rad);
+            ctx1.globalCompositeOperation = 'source-over';
+            
+            // draw the actual bubble
+            grad = ctx1.createRadialGradient(rad, rad, 0, rad, rad, rad);
+            grad = addBubbleStops(grad, 1-thickness/rad, blurFactor);
+            ctx1.fillStyle = grad;
+            ctx1.fillRect(0, 0, 2*rad, 2*rad);
 
-            for (i = 0; i < NUM_BUBBLES; i++) {
-                x = Math.random()*width;
-                y = Math.random()*height;
-                rad = r*(1-Math.random()/3);
-
-                grad = ctx1.createRadialGradient(x, y, 0, x, y, rad);
-                grad = addBubbleStops(grad, 1-thickness/rad, blurFactor);
-                ctx1.fillStyle = grad;
-                ctx1.fillRect(0, 0, width, height);
-            }
+            return ctx1.getImageData(0, 0, 2*rad, 2*rad);
         }
-        // composite the bubbles by first 'screen'ing them in and then alpha-blending them
-        function composite () {
-            ctx0.globalCompositeOperation = 'screen';
-            // some browsers (ipad) don't have a 'screen' composite operation!
-            // just skip this step in that case.
-            if (ctx0.globalCompositeOperation == 'screen') {
-                ctx0.drawImage(canv1, 0, 0);
-            }
-            ctx0.globalCompositeOperation = 'destination-in';
-            ctx0.drawImage(canv1, 0, 0);
+
+        function drawBubblesInWorkerThread(target) {
+            var bubbleList = [null, null, null].map(drawBubble);
+            
+            // set up a web worker to render the bubbles in another thread
+            worker = new Worker('/js/bokeh-webworker.js');
+            worker.addEventListener('message', function(e) {
+                var data = e.data;
+                target.getContext('2d').putImageData(data.targetBuffer, 0, 0);
+            });
+            worker.postMessage({
+                numBubbles: NUM_BUBBLES,
+                bubbleList: bubbleList,
+                targetBuffer: targetBuffer,
+                sourceBuffer: sourceBuffer,
+            });
         }
+
+        drawBack();
+        ctx1.clearRect(0, 0, width, height);
+        targetBuffer = ctx1.getImageData(0, 0, width, height);
+        sourceBuffer = ctx0.getImageData(0, 0, width, height);
+        
 
         // draw the background bubbles
         r = 35;
         thickness = 10;
         blurFactor = .6;
-        drawBack();
-        drawBubbles();
-        composite();
-        this.layers[1].getContext('2d').drawImage(canv0, 0, 0);
+        drawBubblesInWorkerThread(this.layers[1]);
+
         // draw the foreground bubbles
         r = 60;
         thickness = 20;
         blurFactor = .2;
-        drawBack();
-        drawBubbles();
-        composite();
-        this.layers[2].getContext('2d').drawImage(canv0, 0, 0);
+        drawBubblesInWorkerThread(this.layers[2]);
     };
 
     Bokeh.prototype.drawBackground = function () {
@@ -196,17 +204,23 @@ var Bokeh = (function () {
         ctx.fillStyle = grad;
         ctx.fillRect(0, 0, width, height);
 
+        /*
         // add film grain
         var imageData = ctx.getImageData(0, 0, width, height);
         var data = imageData.data;
+        var noise = new Int8Array(5287);
+        for (i = 0; i < noise.length; i++) {
+            noise[i] = (Math.random()-.5)*15;
+        }
         for (var i=0, len = data.length; i < len; i++) {
             // do nothing to the alpha channel
             if (i % 4 == 0) {
               continue;
             }
-            data[i] += (Math.random()-.5)*15;
+            data[i] += noise[i % noise.length];
         }
         ctx.putImageData(imageData, 0, 0);
+        */
 
         // add the vingette
         var maxDim = Math.max(width, height);
@@ -220,3 +234,58 @@ var Bokeh = (function () {
 
     return Bokeh;
 })();
+
+function doBubbleBlend(e) {
+    "use strict";
+    var i = 0, j = 0, k = 0, x = 0, y = 0, xpos = 0, ypos = 0, stride = 0, strideBubble = 0, alpha = 0.0, a = 0, b = 0;
+    var data = e.data;
+
+    var numBubbles = data.numBubbles;
+    var bubbleList = data.bubbleList;
+    var targetBuffer = data.targetBuffer;
+    var sourceBuffer = data.sourceBuffer;
+
+    for (k = 0; k < numBubbles; k++) {
+        // select a random bubble
+        var bubble = bubbleList[Math.floor(Math.random()*bubbleList.length)];
+
+        // put ourselves in the upper left corder of the random bubble for painting
+        x = Math.round(Math.random()*targetBuffer.width - bubble.width/2);
+        y = Math.round(Math.random()*targetBuffer.height - bubble.height/2);
+
+        // duplicate the bubble
+        for (j = 0; j < bubble.height; j++) {
+            for (i = 0; i < bubble.width; i++) {
+                xpos = x + i;
+                ypos = y + j;
+                if (xpos < 0 || ypos < 0) {
+                    continue;
+                }
+
+                stride = ypos*targetBuffer.width*4 + xpos*4;
+                strideBubble = j*bubble.width*4 + i*4;
+                
+                alpha = bubble.data[strideBubble + 3]/255;
+                // if there is nothing to blend, do nothing
+                if (alpha === 0) {
+                    continue;
+                }
+
+                // do screen blending of each channel
+                a = targetBuffer.data[stride + 0]/255;
+                b = (sourceBuffer.data[stride + 0] + bubble.data[strideBubble + 0])/255;
+                targetBuffer.data[stride + 0] = 255*(1-(1-a)*(1-b));
+                a = targetBuffer.data[stride + 1]/255;
+                b = (sourceBuffer.data[stride + 1] + bubble.data[strideBubble + 1])/255;
+                targetBuffer.data[stride + 1] = 255*(1-(1-a)*(1-b));
+                a = targetBuffer.data[stride + 2]/255;
+                b = (sourceBuffer.data[stride + 2] + bubble.data[strideBubble + 2])/255;
+                targetBuffer.data[stride + 2] = 255*(1-(1-a)*(1-b));
+                // copy the alpha channel directly
+                a = targetBuffer.data[stride + 3]/255;
+                b = bubble.data[strideBubble + 3]/255
+                targetBuffer.data[stride + 3] += 255*(a + b - a*b);
+            }
+        }
+    }
+}
