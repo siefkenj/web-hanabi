@@ -512,6 +512,10 @@ window.onload = function () {
         document.location.href = lobbyUrl;
     }
 
+    // setup the background
+    var b = new Bokeh();
+    b.initialize();
+
     // Set up the web socket
     var socket = io.connect();
     window.ss = socket;

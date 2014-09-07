@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Hanabi Lobby</title>
+	<link href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+	<script src="/js/classList.js"></script>
+	<script src="/js/socket.io.js"></script>
+	<script src="/js/bokeh.js"></script>
+	<script src="/js/lobby.js"></script>
+	<link href="/css/fonts.css" rel="stylesheet">
+	<link href="/css/lobby.css" rel="stylesheet">
+<style>
+</style>
+</head>
+<body>
+	<div id="header">Hanabi Lobby</div>
+	<div id="body">
+		<div id="info-row">
+			<ul>
+				<li><span class="info-title">Name:</span><span class="editable" title="Click to edit"><span class="name editable-text">My Name</span><i class="fa fa-edit edit"></i></span></li>
+				<li><span class="info-title">Room:</span><span class="room">My Room</span></li>
+			</ul>
+		</div>
+		<div id="content">
+			<div class="column">
+				<div class="column-title">Rooms</div>
+				<div class="column-container rooms">
+					<ul class="room-list">
+						<li class="joinable" x-room="room 1">room 1</li>
+						<li class="joinable" x-room="room 2">room 2</li>
+						<li class="selected-room" x-room="room 3">room 3</li>
+						<li class="joinable" x-room="room 4">room 4</li>
+					</ul>
+					<ul class="bottom-buttons">
+						<li id="new-room-button"><i class="fa fa-plus-circle" style="position: absolute; left: 10px; bottom: 5px;"></i> New Room</li>
+					</ul>
+				</div>
+			</div>
+			<div class="column">
+				<div class="column-title">Participants</div>
+				<div class="column-container participants">
+					<ul class="clients-list">
+						<li class="ready">person 1</li>
+						<li class="not-ready">person 2</li>
+						<li class="ready">person 4</li>
+					</ul>
+					<ul class="bottom-buttons">
+						<li id="ready-button"><i class="icon fa fa-play-circle" style="position: absolute; left: 10px; bottom: 5px;"></i><span class="text">Ready</span></li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div id="footer">Sweet game bro!</div>
+</body>
+</html>

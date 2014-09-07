@@ -64,6 +64,11 @@ var Bokeh = (function () {
         this.drawBackground();
         this.setupContainer();
         this.initializeListeners();
+        // create the CSS
+        var styleElm = document.createElement('style');
+        styleElm.type = 'text/css';
+        styleElm.innerHTML = '#bokeh-container { position: absolute; left: 0px; top: 0px; overflow: hidden; width: 100%; height: 100%; z-index: -1; }';
+        document.head.appendChild(styleElm);
         document.body.appendChild(this.container);
     };
     Bokeh.prototype.initializeListeners = function () {

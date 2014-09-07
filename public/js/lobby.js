@@ -113,6 +113,11 @@ window.onload = function () {
     changeName(name)
     changeRoom(room)
 
+    // setup the background
+    var b = new Bokeh();
+    b.initialize();
+
+
     function changeName(newName) {
         var change = (name != newName);
         name = newName || name;
