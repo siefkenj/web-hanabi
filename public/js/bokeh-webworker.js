@@ -25,8 +25,9 @@ function doBubbleBlend(e) {
         y = Math.round(Math.random()*targetBuffer.height - bubble.height/2);
 
         // duplicate the bubble
-        for (j = 0; j < bubble.height; j++) {
-            for (i = 0; i < bubble.width; i++) {
+        // don't use the border pixel 'cause it causes problems on some browsers...
+        for (j = 0; j < bubble.height - 1; j++) {
+            for (i = 0; i < bubble.width - 1; i++) {
                 xpos = x + i;
                 ypos = y + j;
                 if (xpos < 0 || ypos < 0) {
