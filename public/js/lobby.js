@@ -28,7 +28,7 @@ function updateUriString (vals) {
     }
     var searchString = "?" + search.join('&');
     var newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + searchString;
-    window.history.pushState({path: newUrl}, '', newUrl);
+    window.history.replaceState({path: newUrl}, '', newUrl);
 }
 
 function createRandomRoomName (excludeNames) {
