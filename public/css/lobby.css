@@ -34,21 +34,18 @@ body {
   color: #fff;
   font-family: sans-serif;
 }
-body:after {
-  background-image: -webkit-radial-gradient(circle closest-side at center center, rgba(0,0,0,0) 70%, rgba(0,0,0,0.4) 250%);
-  background-image: -moz-radial-gradient(circle closest-side at center center, rgba(0,0,0,0) 70%, rgba(0,0,0,0.4) 250%);
-  background-image: -o-radial-gradient(circle closest-side at center center, rgba(0,0,0,0) 70%, rgba(0,0,0,0.4) 250%);
-  background-image: -ms-radial-gradient(circle closest-side at center center, rgba(0,0,0,0) 70%, rgba(0,0,0,0.4) 250%);
-  background-image: radial-gradient(circle closest-side at center center, rgba(0,0,0,0) 70%, rgba(0,0,0,0.4) 250%);
-  bottom: 0;
-  left: 0;
-  right: 0;
-  top: 0;
-  content: "";
-  pointer-events: none;
-  position: absolute;
-  z-index: -1;
-}
+/* XXX this causes major performance penalty.  Find a way to conditionally activate it... XXX
+body:after
+	background-image: radial-gradient(circle closest-side at center center , rgba(0, 0, 0, 0) 70%, rgba(0, 0, 0, 0.4) 250%);
+	bottom: 0;
+	left: 0;
+	right: 0;
+	top: 0;
+	content: "";
+	pointer-events: none;
+	position: absolute;
+	z-index: -1;
+*/
 #body {
   -webkit-box-flex: 1;
   -moz-box-flex: 1;
