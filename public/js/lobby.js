@@ -130,6 +130,10 @@ window.onload = function () {
             socket.emit('set-name', name);
         } catch (e) {}
     }
+
+    // set up the rooms object
+    var roomsList = new RoomsList(document.querySelector('.room-list'));
+
     function changeRoom(newRoom) {
         var change = (room != newRoom);
         room = newRoom || room;
@@ -154,6 +158,7 @@ window.onload = function () {
     }
     makeElementEditable(document.querySelector('.editable'), changeName);
 
+    /*
     function roomClicked(e) {
         var elm = e.target;
         // We're actually an LI element that has a room attribute.
@@ -163,6 +168,8 @@ window.onload = function () {
         }
     }
     document.querySelector('.room-list').addEventListener('click', roomClicked);
+    */
+    roomsList.roomClicked = changeRoom;
 
     
     var readyState = false;
@@ -232,9 +239,10 @@ window.onload = function () {
             // socket.io rooms always start with a slash, so get rid of it.
             roomName = roomName.slice(1);
             existingRooms.push(roomName);
-            roomListStr += "<li x-room='" + roomName + "'>" + roomName + "</li>";
+            // roomListStr += "<li x-room='" + roomName + "'>" + roomName + "</li>";
         }
-        document.querySelector('.room-list').innerHTML = roomListStr;
+        //document.querySelector('.room-list').innerHTML = roomListStr;
+        roomsList.updateRooms(existingRooms);
         changeRoom(room);
 
         // update the clients list
@@ -281,3 +289,69 @@ window.onload = function () {
             document.location.href = pageRedirect;
     });
 }
+
+// Define a class to handle the room's list
+// Whenever a room is clicked, the roomClicked function
+// is called with the first argument being the room name
+var RoomsList = (function() {
+    // helper functions
+    function removeAllChildren(node) {
+        while (node.firstChild) {
+            node.removeChild(node.firstChild);
+        }
+    }
+    function appendChildren(node, children) {
+        var i;
+        for (i = 0; i < children.length; i++) {
+            node.appendChild(children[i]);
+        }
+    }
+
+
+    // class init function
+    "use strict";
+    function RoomsList(parent) {
+        var _this = this;
+
+        this.parent = parent;
+        this.rooms = [];
+
+        this.parent.addEventListener('click', function (e) {
+            var elm = e.target;
+            if (elm.hasAttribute('x-room')) {
+                _this.roomClicked(elm.getAttribute('x-room'), elm, e);
+            }
+        });
+    }
+
+    RoomsList.prototype.createRoomElement = function(roomName) {
+        var li = document.createElement('li');
+        li.textContent = roomName;
+        li.setAttribute('x-room', roomName);
+        return li;
+    };
+
+    RoomsList.prototype.updateRooms = function(rooms) {
+        var i, roomName, roomList;
+
+        roomList = []
+        for (i = 0; i < rooms.length; i++) {
+            roomName = rooms[i];
+            if (roomName == '') {
+                continue;
+            }
+
+            roomList.push(this.createRoomElement(roomName));
+        }
+
+        removeAllChildren(this.parent);
+        appendChildren(this.parent, roomList);
+        this.rooms = roomList;
+    };
+
+    // called whenever a room button is clicked.
+    // The argument passed to the callback is <the name of the room>,<elemnt>,<event>
+    RoomsList.prototype.roomClicked = function () {};
+
+    return RoomsList;
+})();
